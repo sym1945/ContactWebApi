@@ -1,7 +1,7 @@
 using ContactWebApi.App.Features.Employee.Commands.Import;
+using ContactWebApi.App.Features.Employee.DTOs;
 using ContactWebApi.App.Features.Employee.Queries.GetByName;
 using ContactWebApi.App.Features.Employee.Queries.GetPage;
-using ContactWebApi.App.Models;
 using ContactWebApi.Domain.Enums;
 using ContactWebApi.Helpers;
 using MediatR;

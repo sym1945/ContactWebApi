@@ -1,4 +1,4 @@
-﻿using ContactWebApi.App.Parsers;
+﻿using ContactWebApi.App.Features.Employee.Parsers;
 using ContactWebApi.Domain.Enums;
 using MediatR;
 
@@ -7,22 +7,29 @@ namespace ContactWebApi.App.Features.Employee.Commands.Import
 {
     public class ImportEmployeeFromTextRequestHandler : IRequestHandler<ImportEmployeeFromTextRequest, int>
     {
-        public ImportEmployeeFromTextRequestHandler()
+        private readonly IEmployeeImporter _Importer;
+
+        public ImportEmployeeFromTextRequestHandler(IEmployeeImporter importer)
         {
+            _Importer = importer;
         }
 
-        public Task<int> Handle(ImportEmployeeFromTextRequest request, CancellationToken cancellationToken)
+        public async Task<int> Handle(ImportEmployeeFromTextRequest request, CancellationToken cancellationToken)
         {
             int totalCount = 0;
             try
             {
-                var parser = new EmployeeJsonParser();
+                var parser = new EmployeeParser(EImportDataType.Json);
                 foreach (var employee in parser.Parse(request.Text))
                 {
+                    // TODO: employee validataion
+                    await _Importer.AddAsync(employee, cancellationToken);
                     totalCount++;
                 }
 
-                return Task.FromResult(totalCount);
+                var result = await _Importer.SaveAsync();
+
+                return result.Count;
             }
             catch (Exception)
             {
@@ -31,13 +38,17 @@ namespace ContactWebApi.App.Features.Employee.Commands.Import
             totalCount = 0;
             try
             {
-                var parser = new EmployeeCsvParser();
+                var parser = new EmployeeParser(EImportDataType.Csv);
                 foreach (var employee in parser.Parse(request.Text))
                 {
+                    // TODO: employee validataion
+                    await _Importer.AddAsync(employee, cancellationToken);
                     totalCount++;
                 }
 
-                return Task.FromResult(totalCount);
+                var result = await _Importer.SaveAsync();
+
+                return result.Count;
             }
             catch (Exception)
             {

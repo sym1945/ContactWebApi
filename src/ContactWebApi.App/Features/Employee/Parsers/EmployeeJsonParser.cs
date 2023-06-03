@@ -1,8 +1,8 @@
 ﻿using ContactWebApi.App.Common.JsonConverters;
-using ContactWebApi.App.Models;
+using ContactWebApi.App.Features.Employee.DTOs;
 using System.Text.Json;
 
-namespace ContactWebApi.App.Parsers
+namespace ContactWebApi.App.Features.Employee.Parsers
 {
     public class EmployeeJsonParser : IEmployeeParser
     {

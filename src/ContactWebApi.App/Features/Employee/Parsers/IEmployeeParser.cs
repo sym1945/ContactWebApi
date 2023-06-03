@@ -1,6 +1,6 @@
-﻿using ContactWebApi.App.Models;
+﻿using ContactWebApi.App.Features.Employee.DTOs;
 
-namespace ContactWebApi.App.Parsers
+namespace ContactWebApi.App.Features.Employee.Parsers
 {
     public interface IEmployeeParser
     {

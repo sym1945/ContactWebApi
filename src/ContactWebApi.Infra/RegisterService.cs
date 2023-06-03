@@ -1,5 +1,7 @@
 ﻿using ContactWebApi.App.Common.Interfaces;
+using ContactWebApi.App.Features.Employee.Commands.Import;
 using ContactWebApi.Infra.Datas.Contact;
+using ContactWebApi.Infra.Datas.Contact.Employees;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +19,8 @@ namespace ContactWebApi.Infra
             services.AddTransient<IContactDbContext>(provider =>
                 provider.GetRequiredService<ContactDbContext>()
             );
+            
+            services.AddScoped<IEmployeeImporter, EmployeeImporterDefault>();
 
             return services;
         }

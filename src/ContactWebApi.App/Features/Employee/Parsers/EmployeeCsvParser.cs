@@ -1,7 +1,8 @@
-﻿using ContactWebApi.App.Models;
+﻿using ContactWebApi.App.Common.Extensions;
+using ContactWebApi.App.Features.Employee.DTOs;
 using Sylvan.Data.Csv;
 
-namespace ContactWebApi.App.Parsers
+namespace ContactWebApi.App.Features.Employee.Parsers
 {
     public class EmployeeCsvParser : IEmployeeParser
     {
@@ -19,13 +20,7 @@ namespace ContactWebApi.App.Parsers
 
             while (csv.Read())
             {
-                var employee = new EmployeeDto
-                {
-                    Name = csv.GetString(0),
-                    Email = csv.GetString(1),
-                    Tel = csv.GetString(2),
-                    Joined = csv.GetDate(3),
-                };
+                var employee = ToRecord(csv);
 
                 yield return employee;
             }
@@ -40,17 +35,25 @@ namespace ContactWebApi.App.Parsers
 
             while (await csv.ReadAsync())
             {
-                var employee = new EmployeeDto
-                {
-                    Name = csv.GetString(0),
-                    Email = csv.GetString(1),
-                    Tel = csv.GetString(2),
-                    Joined = csv.GetDate(3),
-                };
+                var employee = ToRecord(csv);
 
                 yield return employee;
             }
         }
+
+        private static EmployeeDto ToRecord(CsvDataReader csv)
+        {
+            var record = new EmployeeDto
+            {
+                Name = csv.GetString(0),
+                Email = csv.GetString(1),
+                Tel = csv.GetString(2).FormatTel(),
+                Joined = csv.GetDate(3),
+            };
+
+            return record;
+        }
+
 
         private static string TrimString(char[] buf, int offset, int length)
         {

@@ -1,4 +1,4 @@
-﻿using ContactWebApi.App.Models;
+﻿using ContactWebApi.App.Features.Employee.DTOs;
 using MediatR;
 
 namespace ContactWebApi.App.Features.Employee.Queries.GetByName

@@ -1,7 +1,7 @@
 ﻿using ContactWebApi.App.Common.JsonConverters;
 using System.Text.Json.Serialization;
 
-namespace ContactWebApi.App.Models
+namespace ContactWebApi.App.Features.Employee.DTOs
 {
     public class EmployeeDto
     {

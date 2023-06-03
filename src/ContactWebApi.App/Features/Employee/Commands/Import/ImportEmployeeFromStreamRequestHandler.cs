@@ -1,4 +1,4 @@
-﻿using ContactWebApi.App.Parsers;
+﻿using ContactWebApi.App.Features.Employee.Parsers;
 using ContactWebApi.Domain.Enums;
 using MediatR;
 
@@ -7,41 +7,31 @@ namespace ContactWebApi.App.Features.Employee.Commands.Import
 {
     public class ImportEmployeeFromStreamRequestHandler : IRequestHandler<ImportEmployeeFromStreamRequest, int>
     {
-        public ImportEmployeeFromStreamRequestHandler()
+        private readonly IEmployeeImporter _Importer;
+
+        public ImportEmployeeFromStreamRequestHandler(IEmployeeImporter importer)
         {
+            _Importer = importer;
         }
 
         public async Task<int> Handle(ImportEmployeeFromStreamRequest request, CancellationToken cancellationToken)
         {
-            int totalCount = 0;
+            // TODO: not suporrted
+            if (request.DataType == EImportDataType.Unknown)
+                throw new Exception();
 
-            switch (request.DataType)
+            var parser = new EmployeeParser(request.DataType);
+
+            await foreach (var employee in parser.Parse(request.DataStream))
             {
-                case EImportDataType.Json:
-                    {
-                        var parser = new EmployeeJsonParser();
-                        await foreach (var employee in parser.Parse(request.DataStream))
-                        {
-                            totalCount++;
-                        }
-                        break;
-                    }
-                case EImportDataType.Csv:
-                    {
-                        var parser = new EmployeeCsvParser();
-                        await foreach (var employee in parser.Parse(request.DataStream))
-                        {
-                            totalCount++;
-                        }
-                        break;
-                    }
-                default:
-                    {
-                        throw new Exception();
-                    }
+                // TODO: employee validataion
+
+                await _Importer.AddAsync(employee, cancellationToken);
             }
 
-            return totalCount;
+            var result = await _Importer.SaveAsync(cancellationToken);
+
+            return result.Count;
         }
     }
 }

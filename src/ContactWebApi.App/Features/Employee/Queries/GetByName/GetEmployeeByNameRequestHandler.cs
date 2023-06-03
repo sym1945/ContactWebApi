@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using ContactWebApi.App.Common.Interfaces;
-using ContactWebApi.App.Models;
+using ContactWebApi.App.Features.Employee.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
