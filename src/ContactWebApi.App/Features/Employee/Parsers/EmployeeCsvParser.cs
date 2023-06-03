@@ -1,10 +1,5 @@
 ﻿using ContactWebApi.App.Models;
 using Sylvan.Data.Csv;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ContactWebApi.App.Parsers
 {
@@ -17,16 +12,14 @@ namespace ContactWebApi.App.Parsers
             StringFactory = TrimString
         };
 
-        public IList<Employee> Parse(string text)
+        public IEnumerable<EmployeeDto> Parse(string text)
         {
             using var reader = new StringReader(text);
             using var csv = CsvDataReader.Create(reader, _Option);
 
-            var result = new List<Employee>();
-
             while (csv.Read())
             {
-                var contact = new Employee
+                var employee = new EmployeeDto
                 {
                     Name = csv.GetString(0),
                     Email = csv.GetString(1),
@@ -34,22 +27,20 @@ namespace ContactWebApi.App.Parsers
                     Joined = csv.GetDate(3),
                 };
 
-                result.Add(contact);
+                yield return employee;
             }
-
-            return result;
         }
 
-        public async IAsyncEnumerable<Employee> Parse(Stream stream)
+        public async IAsyncEnumerable<EmployeeDto> Parse(Stream stream)
         {
             using var reader = new StreamReader(stream);
             using var csv = CsvDataReader.Create(reader, _Option);
 
-            var result = new List<Employee>();
+            var result = new List<EmployeeDto>();
 
             while (await csv.ReadAsync())
             {
-                var contact = new Employee
+                var employee = new EmployeeDto
                 {
                     Name = csv.GetString(0),
                     Email = csv.GetString(1),
@@ -57,7 +48,7 @@ namespace ContactWebApi.App.Parsers
                     Joined = csv.GetDate(3),
                 };
 
-                yield return contact;
+                yield return employee;
             }
         }
 

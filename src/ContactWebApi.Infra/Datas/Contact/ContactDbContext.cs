@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace ContactWebApi.Infra.Datas.Contact
+#nullable disable
 {
+
     public class ContactDbContext : DbContext
     {
         public DbSet<Employee> Employees { get; set; }

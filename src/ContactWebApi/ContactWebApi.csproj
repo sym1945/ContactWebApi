@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ContactWebApi.App\ContactWebApi.App.csproj" />
+    <ProjectReference Include="..\ContactWebApi.Infra\ContactWebApi.Infra.csproj" />
   </ItemGroup>
 
 </Project>

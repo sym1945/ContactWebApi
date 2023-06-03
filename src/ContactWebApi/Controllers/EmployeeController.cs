@@ -1,3 +1,4 @@
+using ContactWebApi.App.Features.Employee.Queries.GetPage;
 using ContactWebApi.App.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,21 +16,21 @@ namespace ContactWebApi.Controllers
         }
 
         [HttpGet]
-        public Task<List<Employee>> GetEmployees([FromQuery] EmployeeRequest request)
+        public IAsyncEnumerable<EmployeeDto> GetEmployeesPage([FromQuery] GetEmployeePageRequest request)
         {
-            return Task.FromResult(new List<Employee>());
+            throw new NotImplementedException();
         }
 
         [HttpGet("{name}")]
-        public Task<List<Employee>> GetEmployeeDetail(string name)
-        { 
-            return Task.FromResult(new List<Employee>());
+        public Task<IList<EmployeeDto>> GetEmployeeByName(string name)
+        {
+            throw new NotImplementedException();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddEmployees()
+        public Task<IActionResult> ImportEmployees()
         {
-            return CreatedAtAction(nameof(GetEmployees), null);
+            throw new NotImplementedException();
         }
     }
 }

@@ -4,8 +4,8 @@ namespace ContactWebApi.App.Parsers
 {
     public interface IEmployeeParser
     {
-        IList<Employee> Parse(string text);
+        IEnumerable<EmployeeDto> Parse(string text);
 
-        IAsyncEnumerable<Employee> Parse(Stream stream);
+        IAsyncEnumerable<EmployeeDto> Parse(Stream stream);
     }
 }
