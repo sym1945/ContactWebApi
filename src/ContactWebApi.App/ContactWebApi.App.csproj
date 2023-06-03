@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Employee\Commands\Import\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ContactWebApi.Domain\ContactWebApi.Domain.csproj" />
   </ItemGroup>
 

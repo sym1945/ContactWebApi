@@ -1,5 +1,4 @@
-﻿using ContactWebApi.App.Features.Employee.Mappers;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -9,8 +8,7 @@ namespace ContactWebApi.App
     {
         public static IServiceCollection ConfigureApp(this IServiceCollection services, IConfiguration config)
         {
-            //services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddAutoMapper(a => a.AddProfile(new EmployeeDtoMapper()));
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             services.AddMediatR(cfg =>
             {
