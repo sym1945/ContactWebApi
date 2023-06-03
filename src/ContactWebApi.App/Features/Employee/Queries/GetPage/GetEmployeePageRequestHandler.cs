@@ -20,8 +20,12 @@ namespace ContactWebApi.App.Features.Employee.Queries.GetPage
 
         public IAsyncEnumerable<EmployeeDto> Handle(GetEmployeePageRequest request, CancellationToken cancellationToken)
         {
+            // TODO: request validation check
+            // page > 0
+            // 0 < pageSize < 100
+
             int takeCount = request.PageSize;
-            int skipCount = request.Page * takeCount;
+            int skipCount = (request.Page - 1) * takeCount;
 
             return _Context.Employees
                         .AsNoTracking()

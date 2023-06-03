@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContactWebApi.Infra.Datas.Contact.Migrations
 {
     [DbContext(typeof(ContactDbContext))]
-    [Migration("20230602013604_initial")]
+    [Migration("20230603045124_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,13 +37,16 @@ namespace ContactWebApi.Infra.Datas.Contact.Migrations
                         .HasMaxLength(320)
                         .HasColumnType("varchar(320)");
 
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Joined")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Tel")
                         .IsRequired()
@@ -55,10 +58,47 @@ namespace ContactWebApi.Infra.Datas.Contact.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("Name");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name"), new[] { "Id", "Email", "Tel", "Joined" });
+
                     b.HasIndex("Tel")
                         .IsUnique();
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("ContactWebApi.Domain.Entities.EmployeeGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmployeeGroups");
+                });
+
+            modelBuilder.Entity("ContactWebApi.Domain.Entities.Employee", b =>
+                {
+                    b.HasOne("ContactWebApi.Domain.Entities.EmployeeGroup", "Group")
+                        .WithMany("Employees")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("ContactWebApi.Domain.Entities.EmployeeGroup", b =>
+                {
+                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

@@ -39,12 +39,12 @@ namespace ContactWebApi.Infra.Datas.Contact.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Joined")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Tel")
                         .IsRequired()
@@ -57,6 +57,10 @@ namespace ContactWebApi.Infra.Datas.Contact.Migrations
                         .IsUnique();
 
                     b.HasIndex("GroupId");
+
+                    b.HasIndex("Name");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name"), new[] { "Id", "Email", "Tel", "Joined" });
 
                     b.HasIndex("Tel")
                         .IsUnique();

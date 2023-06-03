@@ -1,5 +1,7 @@
+using ContactWebApi.App.Features.Employee.Queries.GetByName;
 using ContactWebApi.App.Features.Employee.Queries.GetPage;
 using ContactWebApi.App.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContactWebApi.Controllers
@@ -8,23 +10,29 @@ namespace ContactWebApi.Controllers
     [Route("api/[controller]")]
     public class EmployeeController : ControllerBase
     {
+        private readonly IMediator _Mediator;
         private readonly ILogger<EmployeeController> _Logger;
 
-        public EmployeeController(ILogger<EmployeeController> logger)
+        public EmployeeController(IMediator mediator, ILogger<EmployeeController> logger)
         {
+            _Mediator = mediator;
             _Logger = logger;
         }
 
         [HttpGet]
         public IAsyncEnumerable<EmployeeDto> GetEmployeesPage([FromQuery] GetEmployeePageRequest request)
         {
-            throw new NotImplementedException();
+            return _Mediator.CreateStream(request);
         }
 
         [HttpGet("{name}")]
-        public Task<IList<EmployeeDto>> GetEmployeeByName(string name)
+        public async Task<IActionResult> GetEmployeeByName(string name)
         {
-            throw new NotImplementedException();
+            var result = await _Mediator.Send(new GetEmployeeByNameRequest { EmployeeName = name });
+            if (result.Count == 0)
+                return NotFound(name);
+
+            return Ok(result);
         }
 
         [HttpPost]

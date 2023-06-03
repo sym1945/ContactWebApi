@@ -21,17 +21,12 @@ namespace ContactWebApi.App.Features.Employee.Queries.GetByName
         public async Task<IList<EmployeeDto>> Handle(GetEmployeeByNameRequest request, CancellationToken cancellationToken)
         {
             // TODO: request validation check
+
             var result = await _Context.Employees
                                 .AsNoTracking()
                                 .Where(employee => employee.Name == request.EmployeeName)
                                 .ProjectTo<EmployeeDto>(_Mapper.ConfigurationProvider)
                                 .ToListAsync(cancellationToken);
-
-            if (result.Count == 0)
-            {
-                // TODO: Not found Exception
-                throw new Exception("not found");
-            }
 
             return result;
         }
