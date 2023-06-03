@@ -19,4 +19,10 @@
     <ProjectReference Include="..\ContactWebApi.App\ContactWebApi.App.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Resources\Infra\Employees.fmt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

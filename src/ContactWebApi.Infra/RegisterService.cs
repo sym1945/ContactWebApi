@@ -19,8 +19,9 @@ namespace ContactWebApi.Infra
             services.AddTransient<IContactDbContext>(provider =>
                 provider.GetRequiredService<ContactDbContext>()
             );
-            
-            services.AddScoped<IEmployeeImporter, EmployeeImporterDefault>();
+
+            services.AddScoped<IEmployeeImporter, EmployeeImporterMssql>();
+            //services.AddScoped<IEmployeeImporter, EmployeeImporterDefault>();
 
             return services;
         }
