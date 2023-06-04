@@ -16,6 +16,8 @@ namespace ContactWebApi.App.Features.Employee.Commands
 
         public async Task<EmployeeImportResult> Handle(ImportEmployeeFromTextRequest request, CancellationToken cancellationToken)
         {
+            var validator = new EmployDtoValidator();
+
             int totalCount = 0;
             try
             {
@@ -23,6 +25,9 @@ namespace ContactWebApi.App.Features.Employee.Commands
                 foreach (var employee in parser.Parse(request.Text))
                 {
                     // TODO: employee validataion
+                    if (!validator.IsValid(employee))
+                        throw new Exception();
+                    
                     await _Importer.AddAsync(employee, cancellationToken);
                     totalCount++;
                 }
@@ -42,6 +47,9 @@ namespace ContactWebApi.App.Features.Employee.Commands
                 foreach (var employee in parser.Parse(request.Text))
                 {
                     // TODO: employee validataion
+                    if (!validator.IsValid(employee))
+                        throw new Exception();
+
                     await _Importer.AddAsync(employee, cancellationToken);
                     totalCount++;
                 }

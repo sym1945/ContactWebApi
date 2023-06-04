@@ -20,11 +20,14 @@ namespace ContactWebApi.App.Features.Employee.Commands
             if (request.DataType == EImportDataType.Unknown)
                 throw new Exception();
 
+            var validator = new EmployDtoValidator();
             var parser = new EmployeeParser(request.DataType);
 
             await foreach (var employee in parser.Parse(request.DataStream))
             {
                 // TODO: employee validataion
+                if (!validator.IsValid(employee))
+                    throw new Exception();
 
                 await _Importer.AddAsync(employee, cancellationToken);
             }

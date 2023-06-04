@@ -23,7 +23,7 @@ namespace ContactWebApi.App.Features.Employee.Queries
             CurrentPageNo = currentPageNo;
             TotalPageCount = totalPageCount;
 
-            if (uriCreator != null)
+            if (uriCreator != null && totalPageCount > 0)
             {
                 if (currentPageNo > 1)
                 {

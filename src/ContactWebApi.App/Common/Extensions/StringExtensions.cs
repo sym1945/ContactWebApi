@@ -4,6 +4,11 @@ namespace ContactWebApi.App.Common.Extensions
 {
     public static class StringExtensions
     {
+        public static bool IsNullOrEmptyOrWhiteSpace(this string? value)
+        {
+            return (string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value));
+        }
+
         public static string FormatTel(this string value)
         {
             if (value.Length != 11)

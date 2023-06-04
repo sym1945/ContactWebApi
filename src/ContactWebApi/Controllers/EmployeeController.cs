@@ -1,11 +1,12 @@
 using ContactWebApi.App.Features.Employee.Commands;
 using ContactWebApi.App.Features.Employee.DTOs;
 using ContactWebApi.App.Features.Employee.Queries;
+using ContactWebApi.Attributes;
+using ContactWebApi.Constants;
 using ContactWebApi.Domain.Enums;
 using ContactWebApi.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Mime;
 
 
 namespace ContactWebApi.Controllers
@@ -24,7 +25,7 @@ namespace ContactWebApi.Controllers
         }
 
         [HttpGet]
-        [Produces(MediaTypeNames.Application.Json)]
+        [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetEmployeePageResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         public async Task<IActionResult> GetEmployeesPage([FromQuery] GetEmployeePageRequest request)
@@ -39,17 +40,17 @@ namespace ContactWebApi.Controllers
         }
 
         [HttpGet("{name}")]
-        [Produces(MediaTypeNames.Application.Json)]
+        [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeLinkDto>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetEmployeeByName(string name)
+        public async Task<IActionResult> GetEmployeesByName(string name)
         {
             var result = new List<EmployeeLinkDto>();
             var stream = _Mediator.CreateStream(new GetEmployeeByNameRequest { EmployeeName = name });
             await foreach (var employee in stream)
             {
-                employee.Link = new Uri(Url.ActionLink(action: nameof(GetEmployeesById), values: new { id = employee.Id })!);
+                employee.Link = new Uri(Url.ActionLink(action: nameof(GetEmployeeById), values: new { id = employee.Id })!);
                 result.Add(employee);
             }
             if (result.Count == 0)
@@ -59,11 +60,11 @@ namespace ContactWebApi.Controllers
         }
 
         [HttpGet("id/{id}")]
-        [Produces(MediaTypeNames.Application.Json)]
+        [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EmployeeDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetEmployeesById(int id)
+        public async Task<IActionResult> GetEmployeeById(int id)
         {
             var result = await _Mediator.Send(new GetEmployeeByIdRequest { EmployeeId = id });
             if (result == null)
@@ -73,10 +74,10 @@ namespace ContactWebApi.Controllers
         }
 
         [HttpGet("group/{id}")]
-        [Produces(MediaTypeNames.Application.Json)]
+        [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeDto>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
-        public async IAsyncEnumerable<EmployeeDto> GetEmployeeByGroupId(int id)
+        public async IAsyncEnumerable<EmployeeDto> GetEmployeesByGroupId(int id)
         {
             var stream = _Mediator.CreateStream(new GetEmployeeByGroupIdRequest { GroupId = id });
 
@@ -85,7 +86,7 @@ namespace ContactWebApi.Controllers
         }
 
         [HttpPost]
-        [Consumes("application/json", "application/x-www-form-urlencoded")]
+        [ImportEmployeesConsumes]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         public async Task<IActionResult> ImportEmployees()
@@ -133,7 +134,7 @@ namespace ContactWebApi.Controllers
                 throw new Exception();
             }
 
-            var resourceUri = new Uri(Url.ActionLink(action: nameof(GetEmployeeByGroupId), values: new { id = result.GroupId })!);
+            var resourceUri = new Uri(Url.ActionLink(action: nameof(GetEmployeesByGroupId), values: new { id = result.GroupId })!);
 
             var response = new ImportEmployeeResponse
             {
