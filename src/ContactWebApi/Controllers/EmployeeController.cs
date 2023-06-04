@@ -40,11 +40,18 @@ namespace ContactWebApi.Controllers
 
         [HttpGet("{name}")]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeDto>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeLinkDto>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetEmployeeByName(string name)
         {
-            var result = await _Mediator.Send(new GetEmployeeByNameRequest { EmployeeName = name });
+            var result = new List<EmployeeLinkDto>();
+            var stream = _Mediator.CreateStream(new GetEmployeeByNameRequest { EmployeeName = name });
+            await foreach (var employee in stream)
+            {
+                employee.Link = new Uri(Url.ActionLink(action: nameof(GetEmployeesById), values: new { id = employee.Id })!);
+                result.Add(employee);
+            }
             if (result.Count == 0)
                 return NotFound();
 
@@ -54,6 +61,7 @@ namespace ContactWebApi.Controllers
         [HttpGet("id/{id}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EmployeeDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetEmployeesById(int id)
         {
@@ -67,11 +75,12 @@ namespace ContactWebApi.Controllers
         [HttpGet("group/{id}")]
         [Produces(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeDto>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         public async IAsyncEnumerable<EmployeeDto> GetEmployeeByGroupId(int id)
         {
-            var employeeStream = _Mediator.CreateStream(new GetEmployeeByGroupIdRequest { GroupId = id });
+            var stream = _Mediator.CreateStream(new GetEmployeeByGroupIdRequest { GroupId = id });
 
-            await foreach (var employee in employeeStream)
+            await foreach (var employee in stream)
                 yield return employee;
         }
 

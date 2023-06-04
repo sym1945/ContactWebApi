@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ContactWebApi.App.Features.Employee.Queries
 {
-    public class GetEmployeeByNameRequestHandler : IRequestHandler<GetEmployeeByNameRequest, IList<EmployeeDto>>
+    public class GetEmployeeByNameRequestHandler : IStreamRequestHandler<GetEmployeeByNameRequest, EmployeeLinkDto>
     {
         private readonly IContactDbContext _Context;
         private readonly IMapper _Mapper;
@@ -18,17 +18,13 @@ namespace ContactWebApi.App.Features.Employee.Queries
             _Mapper = mapper;
         }
 
-        public async Task<IList<EmployeeDto>> Handle(GetEmployeeByNameRequest request, CancellationToken cancellationToken)
+        public IAsyncEnumerable<EmployeeLinkDto> Handle(GetEmployeeByNameRequest request, CancellationToken cancellationToken)
         {
-            // TODO: request validation check
-
-            var result = await _Context.Employees
-                                .AsNoTracking()
-                                .Where(employee => employee.Name == request.EmployeeName)
-                                .ProjectTo<EmployeeDto>(_Mapper.ConfigurationProvider)
-                                .ToListAsync(cancellationToken);
-
-            return result;
+            return _Context.Employees
+                        .AsNoTracking()
+                        .Where(employee => employee.Name == request.EmployeeName)
+                        .ProjectTo<EmployeeLinkDto>(_Mapper.ConfigurationProvider)
+                        .AsAsyncEnumerable();
         }
     }
 }

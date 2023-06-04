@@ -3,7 +3,7 @@ using MediatR;
 
 namespace ContactWebApi.App.Features.Employee.Queries
 {
-    public class GetEmployeeByNameRequest : IRequest<IList<EmployeeDto>>
+    public class GetEmployeeByNameRequest : IStreamRequest<EmployeeLinkDto>
     {
         public string EmployeeName { get; set; } = string.Empty;
     }
