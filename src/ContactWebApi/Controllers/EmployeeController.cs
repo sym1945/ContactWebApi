@@ -25,11 +25,17 @@ namespace ContactWebApi.Controllers
 
         [HttpGet]
         [Produces(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeDto>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetEmployeePageResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
-        public IAsyncEnumerable<EmployeeDto> GetEmployeesPage([FromQuery] GetEmployeePageRequest request)
+        public async Task<IActionResult> GetEmployeesPage([FromQuery] GetEmployeePageRequest request)
         {
-            return _Mediator.CreateStream(request);
+            request.SetPageUriCreator(new PageUriCreator((page, pageSize) =>
+                new Uri(Url.ActionLink(action: nameof(GetEmployeesPage), values: new { page, pageSize})!)
+            ));
+
+            var result = await _Mediator.Send(request);
+
+            return Ok(result);
         }
 
         [HttpGet("{name}")]
@@ -118,15 +124,15 @@ namespace ContactWebApi.Controllers
                 throw new Exception();
             }
 
-            var link = Url.ActionLink(action: nameof(GetEmployeeByGroupId), values: new { id = result.GroupId });
+            var resourceUri = new Uri(Url.ActionLink(action: nameof(GetEmployeeByGroupId), values: new { id = result.GroupId })!);
 
             var response = new ImportEmployeeResponse
             {
                 CreatedCount = result.Count,
-                ResourceUri = new Uri(link!)
+                ResourceUri = resourceUri
             };
 
-            return CreatedAtAction(nameof(GetEmployeeByGroupId), new { id = result.GroupId }, response);
+            return Created(resourceUri, response);
         }
     }
 

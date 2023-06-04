@@ -2,12 +2,13 @@
 using AutoMapper.QueryableExtensions;
 using ContactWebApi.App.Common.Interfaces;
 using ContactWebApi.App.Features.Employee.DTOs;
+using ContactWebApi.Domain.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContactWebApi.App.Features.Employee.Queries
 {
-    public class GetEmployeePageRequestHandler : IStreamRequestHandler<GetEmployeePageRequest, EmployeeDto>
+    public class GetEmployeePageRequestHandler : IRequestHandler<GetEmployeePageRequest, GetEmployeePageResponse>
     {
         private readonly IContactDbContext _Context;
         private readonly IMapper _Mapper;
@@ -18,22 +19,30 @@ namespace ContactWebApi.App.Features.Employee.Queries
             _Mapper = mapper;
         }
 
-        public IAsyncEnumerable<EmployeeDto> Handle(GetEmployeePageRequest request, CancellationToken cancellationToken)
+        public async Task<GetEmployeePageResponse> Handle(GetEmployeePageRequest request, CancellationToken cancellationToken)
         {
-            // TODO: request validation check
-            // page > 0
-            // 0 < pageSize < 100
+            var validator = new GetEmployeePageRequestValidator();
+            if (!validator.IsValid(request))
+                throw new RequestModelInvalidException();
 
-            int takeCount = request.PageSize.Value;
-            int skipCount = (request.Page.Value - 1) * takeCount;
+            var pageNo = request.Page!.Value;
+            var pageSize = request.PageSize!.Value;
 
-            return _Context.Employees
-                        .AsNoTracking()
-                        .OrderBy(employee => employee.Name)
-                        .Skip(skipCount)
-                        .Take(takeCount)
-                        .ProjectTo<EmployeeDto>(_Mapper.ConfigurationProvider)
-                        .AsAsyncEnumerable();
+            var totalRecordCount = await _Context.Employees.AsNoTracking().CountAsync(cancellationToken);
+            var totalPageCount = (int)Math.Ceiling((double)totalRecordCount / pageSize);
+
+            var items = await _Context.Employees
+                                .AsNoTracking()
+                                .OrderBy(employee => employee.Name)
+                                .Skip((pageNo - 1) * pageSize)
+                                .Take(pageSize)
+                                .ProjectTo<EmployeeDto>(_Mapper.ConfigurationProvider)
+                                .ToListAsync(cancellationToken);
+
+            var response = new GetEmployeePageResponse(items, pageNo, totalPageCount, pageSize, request.GetPageUriCreator());
+
+            return response;
         }
+
     }
 }
