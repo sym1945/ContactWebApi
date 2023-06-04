@@ -1,32 +1,29 @@
 ﻿using ContactWebApi.App.Features.Employee.Commands;
 using ContactWebApi.App.Features.Employee.DTOs;
 using ContactWebApi.Domain.Entities;
-
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ContactWebApi.Infra.Datas.Contact.Employees
 {
     public class EmployeeImporterDefault : IEmployeeImporter
     {
         private readonly ContactDbContext _Context;
-        private int? _GroupId;
+        private EmployeeGroup? _Group;
+        private IDbContextTransaction? _Transaction;
 
         public EmployeeImporterDefault(ContactDbContext context)
         {
             _Context = context;
         }
 
-        private async Task<int> CrateGroupIdAsync(CancellationToken cancelToken = default)
-        {
-            var entry = await _Context.EmployeeGroups.AddAsync(new EmployeeGroup { CreateTime = DateTime.UtcNow }, cancelToken);
-            await _Context.SaveChangesAsync(cancelToken);
-
-            return entry.Entity.Id;
-        }
-
         public async Task AddAsync(EmployeeDto employee, CancellationToken cancelToken = default)
         {
-            if (!_GroupId.HasValue)
-                _GroupId = await CrateGroupIdAsync(cancelToken);
+            // TODO: Thread-safe...
+            if (_Group == null)
+            {
+                _Transaction = await _Context.Database.BeginTransactionAsync();
+                _Group = await _Context.CreateEmployeeGroupAsync(cancelToken);
+            }
 
             await _Context.Employees.AddAsync(new Employee
             {
@@ -34,29 +31,33 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
                 Email = employee.Email,
                 Tel = employee.Tel,
                 Joined = employee.Joined.ToDateTime(TimeOnly.MinValue),
-                GroupId = _GroupId.Value
+                GroupId = _Group.Id
             });
         }
 
         public async Task<EmployeeImportResult> SaveAsync(CancellationToken cancelToken = default)
         {
-            if (!_GroupId.HasValue)
+            if (_Group == null)
                 throw new Exception(); // TODO:
 
             var count = await _Context.SaveChangesAsync(cancelToken);
 
-            return new EmployeeImportResult(_GroupId.Value, count);
+            if (count > 0 && _Transaction != null)
+                await _Transaction.CommitAsync();
+
+            return new EmployeeImportResult(_Group.Id, count);
         }
 
-        public void Clear()
+        public async ValueTask DisposeAsync()
         {
-            // TODO:
+            try
+            {
+                if (_Transaction != null)
+                    await _Transaction.DisposeAsync();
+            }
+            catch
+            {
+            }
         }
-
-        public void Dispose()
-        {
-            _Context.Dispose();
-        }
-
     }
 }

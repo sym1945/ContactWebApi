@@ -2,18 +2,22 @@
 using ContactWebApi.App.Features.Employee.DTOs;
 using ContactWebApi.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using System.Text;
+
 
 namespace ContactWebApi.Infra.Datas.Contact.Employees
 {
     public class EmployeeImporterMssql : IEmployeeImporter
     {
-        private ILogger<EmployeeImporterMssql> _Logger;
+        private readonly ILogger<EmployeeImporterMssql> _Logger;
         private readonly ContactDbContext _Context;
-        private int? _GroupId;
+
         private string? _FilePath;
+        private EmployeeGroup? _Group;
         private StreamWriter? _Writer;
+        private IDbContextTransaction? _Transaction;
 
         public EmployeeImporterMssql(ContactDbContext context, ILogger<EmployeeImporterMssql> logger)
         {
@@ -21,18 +25,14 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
             _Logger = logger;
         }
 
-        private async Task<int> CrateGroupIdAsync(CancellationToken cancelToken = default)
-        {
-            var entry = await _Context.EmployeeGroups.AddAsync(new EmployeeGroup { CreateTime = DateTime.UtcNow }, cancelToken);
-            await _Context.SaveChangesAsync(cancelToken);
-
-            return entry.Entity.Id;
-        }
-
         public async Task AddAsync(EmployeeDto employee, CancellationToken cancelToken = default)
         {
-            if (!_GroupId.HasValue)
-                _GroupId = await CrateGroupIdAsync(cancelToken);
+            // TODO: Thread-safe...
+            if (_Group == null)
+            {
+                _Transaction = await _Context.Database.BeginTransactionAsync();
+                _Group = await _Context.CreateEmployeeGroupAsync(cancelToken);
+            }
 
             if (_Writer == null)
             {
@@ -40,12 +40,12 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
                 _Writer = new StreamWriter(_FilePath, false, Encoding.Unicode);
             }
 
-            await _Writer.WriteLineAsync($"{employee.Name}\t{employee.Email}\t{employee.Tel}\t{employee.Joined.ToString("yyyy-MM-dd")}\t{_GroupId.Value}");
+            await _Writer.WriteLineAsync($"{employee.Name}\t{employee.Email}\t{employee.Tel}\t{employee.Joined.ToString("yyyy-MM-dd")}\t{_Group.Id}");
         }
 
         public async Task<EmployeeImportResult> SaveAsync(CancellationToken cancelToken = default)
         {
-            if (!_GroupId.HasValue || _FilePath == null)
+            if (_Group == null || _FilePath == null)
             {
                 // TODO:
                 throw new Exception();
@@ -58,27 +58,32 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
             var schema = _Context.Employees.EntityType.GetSchema() ?? "dbo";
             var table = _Context.Employees.EntityType.GetTableName();
 
-            _Logger.LogInformation($"Bulk insert format path: {formatFilePath}");
-
             var query = @$"BULK INSERT [{database}].[{schema}].[{table}] FROM '{_FilePath}' WITH (FORMATFILE = '{formatFilePath}')";
 
             var count = await _Context.Database.ExecuteSqlRawAsync(query, cancelToken);
 
-            _Logger.LogInformation("Bulk insert Done!");
+            if (count > 0 && _Transaction != null)
+                await _Transaction.CommitAsync();
 
-            return new EmployeeImportResult(_GroupId.Value, count);
+            return new EmployeeImportResult(_Group.Id, count);
         }
 
-        public void Clear()
+        public async ValueTask DisposeAsync()
         {
-        }
-
-        public void Dispose()
-        {
-            _Writer?.Dispose();
+            try
+            {
+                if (_Transaction != null)
+                    await _Transaction.DisposeAsync();
+            }
+            catch
+            {
+            }
 
             try
             {
+                if (_Writer != null)
+                    await _Writer.DisposeAsync();
+
                 if (_FilePath != null)
                     File.Delete(_FilePath);
             }

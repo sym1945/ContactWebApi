@@ -2,12 +2,10 @@
 
 namespace ContactWebApi.App.Features.Employee.Commands
 {
-    public interface IEmployeeImporter : IDisposable
+    public interface IEmployeeImporter : IAsyncDisposable
     {
         Task AddAsync(EmployeeDto employee, CancellationToken cancelToken = default);
 
         Task<EmployeeImportResult> SaveAsync(CancellationToken cancelToken = default);
-
-        void Clear();
     }
 }

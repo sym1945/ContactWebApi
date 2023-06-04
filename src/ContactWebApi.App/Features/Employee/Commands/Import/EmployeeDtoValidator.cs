@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace ContactWebApi.App.Features.Employee.Commands
 {
-    public class EmployDtoValidator : IModelValidator<EmployeeDto>
+    public class EmployeeDtoValidator : IModelValidator<EmployeeDto>
     {
         private static readonly Regex _EmailRegex = new Regex(@"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$");
         private static readonly Regex _TelRegex = new Regex(@"^[0-9]{3}[-]+[0-9]{4}[-]+[0-9]{4}$");

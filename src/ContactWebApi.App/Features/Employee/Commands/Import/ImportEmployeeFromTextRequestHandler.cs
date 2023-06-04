@@ -16,52 +16,25 @@ namespace ContactWebApi.App.Features.Employee.Commands
 
         public async Task<EmployeeImportResult> Handle(ImportEmployeeFromTextRequest request, CancellationToken cancellationToken)
         {
-            var validator = new EmployDtoValidator();
+            // TODO: not suporrted
+            if (request.DataType == EImportDataType.Unknown)
+                throw new Exception();
 
-            int totalCount = 0;
-            try
+            var validator = new EmployeeDtoValidator();
+            var parser = new EmployeeParser(request.DataType);
+
+            foreach (var employee in parser.Parse(request.Text))
             {
-                var parser = new EmployeeParser(EImportDataType.Json);
-                foreach (var employee in parser.Parse(request.Text))
-                {
-                    // TODO: employee validataion
-                    if (!validator.IsValid(employee))
-                        throw new Exception();
-                    
-                    await _Importer.AddAsync(employee, cancellationToken);
-                    totalCount++;
-                }
+                // TODO: employee validataion
+                if (!validator.IsValid(employee))
+                    throw new Exception();
 
-                var result = await _Importer.SaveAsync();
-
-                return result;
-            }
-            catch (Exception)
-            {
+                await _Importer.AddAsync(employee, cancellationToken);
             }
 
-            totalCount = 0;
-            try
-            {
-                var parser = new EmployeeParser(EImportDataType.Csv);
-                foreach (var employee in parser.Parse(request.Text))
-                {
-                    // TODO: employee validataion
-                    if (!validator.IsValid(employee))
-                        throw new Exception();
+            var result = await _Importer.SaveAsync(cancellationToken);
 
-                    await _Importer.AddAsync(employee, cancellationToken);
-                    totalCount++;
-                }
-
-                var result = await _Importer.SaveAsync();
-
-                return result;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return result;
         }
     }
 }

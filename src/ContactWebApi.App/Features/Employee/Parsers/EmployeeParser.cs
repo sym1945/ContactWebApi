@@ -13,8 +13,7 @@ namespace ContactWebApi.App.Features.Employee.Parsers
             {
                 case EImportDataType.Csv: _Parser = new EmployeeCsvParser(); break;
                 case EImportDataType.Json: _Parser = new EmployeeJsonParser(); break;
-                // TODO: not supported
-                default: throw new Exception();
+                default: throw new NotImplementedException();
             }
         }
 

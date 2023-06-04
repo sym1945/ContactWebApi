@@ -87,51 +87,69 @@ namespace ContactWebApi.Controllers
 
         [HttpPost]
         [ImportEmployeesConsumes]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [Produces(ContentTypes.ApplicationJson)]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ImportEmployeeResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
         public async Task<IActionResult> ImportEmployees()
         {
-            //ValidationProblem()
-
             EmployeeImportResult? result = null;
+            string? contentType = null;
+            Stream? stream = null;
+            string text = string.Empty;
 
             if (Request.HasFormContentType)
             {
                 // 1. File 검색
                 if (Request.Form.Files.Count > 0)
                 {
-                    var file = Request.Form.Files.First();
-                    var dataType = ImportDataTypeConverter.CovertFrom(file.ContentType);
-                    if (dataType == EImportDataType.Unknown)
-                        return BadRequest();
-
-                    result = await _Mediator.Send(new ImportEmployeeFromStreamRequest(dataType, file.OpenReadStream()));
+                    var file = Request.Form.Files[0];
+                    contentType = file.ContentType;
+                    stream = file.OpenReadStream();
                 }
                 // 2. Text 검색
                 else
                 {
-                    if (Request.Form.Count > 0)
-                    {
-                        var text = Request.Form.First().Value[0];
-
-                        result = await _Mediator.Send(new ImportEmployeeFromTextRequest(text));
-                    }
+                    text = Request.Form.First().Value[0];
                 }
             }
             else
             {
                 // 1. Body 검색
-                var dataType = ImportDataTypeConverter.CovertFrom(Request.ContentType);
-                if (dataType == EImportDataType.Unknown)
-                    return BadRequest();
-
-                result = await _Mediator.Send(new ImportEmployeeFromStreamRequest(dataType, Request.Body));
+                contentType = Request.ContentType;
+                stream = Request.Body;
             }
 
-            if (result == null)
+            if (stream != null && contentType != null)
             {
-                // TODO:
-                throw new Exception();
+                // stream에서 데이터 parse
+                var dataType = ImportDataTypeConverter.CovertFrom(contentType);
+                if (dataType == EImportDataType.Unknown)
+                    return StatusCode(415);
+
+                result = await _Mediator.Send(new ImportEmployeeFromStreamRequest(dataType, stream));
+            }
+            else
+            {
+                // text에서 데이터 parse. text 형식 모르니 Json -> Csv 순서로 검사
+                try
+                {
+                    result = await _Mediator.Send(new ImportEmployeeFromTextRequest(EImportDataType.Json, text));
+                }
+                catch
+                {
+                    // TODO: ...
+                }
+
+                try
+                {
+                    result = await _Mediator.Send(new ImportEmployeeFromTextRequest(EImportDataType.Csv, text));
+                }
+                catch
+                {
+                    // TODO: ...
+                    return StatusCode(415);
+                }
             }
 
             var resourceUri = new Uri(Url.ActionLink(action: nameof(GetEmployeesByGroupId), values: new { id = result.GroupId })!);
