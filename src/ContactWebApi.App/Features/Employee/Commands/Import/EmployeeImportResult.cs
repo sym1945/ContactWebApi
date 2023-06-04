@@ -1,4 +1,4 @@
-﻿namespace ContactWebApi.App.Features.Employee.Commands.Import
+﻿namespace ContactWebApi.App.Features.Employee.Commands
 {
     public class EmployeeImportResult
     {

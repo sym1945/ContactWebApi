@@ -7,27 +7,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ContactWebApi.App.Features.Employee.Queries
 {
-    public class GetEmployeeByNameRequestHandler : IRequestHandler<GetEmployeeByNameRequest, IList<EmployeeDto>>
+    public class GetEmployeeByIdRequestHandler : IRequestHandler<GetEmployeeByIdRequest, EmployeeDto?>
     {
         private readonly IContactDbContext _Context;
         private readonly IMapper _Mapper;
 
-        public GetEmployeeByNameRequestHandler(IContactDbContext context, IMapper mapper)
+        public GetEmployeeByIdRequestHandler(IContactDbContext context, IMapper mapper)
         {
             _Context = context;
             _Mapper = mapper;
         }
 
-        public async Task<IList<EmployeeDto>> Handle(GetEmployeeByNameRequest request, CancellationToken cancellationToken)
-        {
-            // TODO: request validation check
 
+        public async Task<EmployeeDto?> Handle(GetEmployeeByIdRequest request, CancellationToken cancellationToken)
+        {
             var result = await _Context.Employees
                                 .AsNoTracking()
-                                .Where(employee => employee.Name == request.EmployeeName)
+                                .Where(employee => employee.Id == request.EmployeeId)
                                 .ProjectTo<EmployeeDto>(_Mapper.ConfigurationProvider)
-                                .ToListAsync(cancellationToken);
-
+                                .FirstOrDefaultAsync(cancellationToken);
             return result;
         }
     }

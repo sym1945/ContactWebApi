@@ -1,5 +1,5 @@
 ﻿using ContactWebApi.App.Common.Interfaces;
-using ContactWebApi.App.Features.Employee.Commands.Import;
+using ContactWebApi.App.Features.Employee.Commands;
 using ContactWebApi.Infra.Datas.Contact;
 using ContactWebApi.Infra.Datas.Contact.Employees;
 using Microsoft.EntityFrameworkCore;

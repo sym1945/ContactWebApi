@@ -1,11 +1,14 @@
 ﻿using ContactWebApi.App.Features.Employee.DTOs;
 using MediatR;
+using System.ComponentModel.DataAnnotations;
 
-namespace ContactWebApi.App.Features.Employee.Queries.GetPage
+namespace ContactWebApi.App.Features.Employee.Queries
 {
     public class GetEmployeePageRequest : IStreamRequest<EmployeeDto>
     {
-        public int Page { get; set; }
-        public int PageSize { get; set; }
+        [Required]
+        public int? Page { get; set; }
+        [Required]
+        public int? PageSize { get; set; }
     }
 }

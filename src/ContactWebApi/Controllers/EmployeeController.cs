@@ -1,11 +1,11 @@
-using ContactWebApi.App.Features.Employee.Commands.Import;
+using ContactWebApi.App.Features.Employee.Commands;
 using ContactWebApi.App.Features.Employee.DTOs;
-using ContactWebApi.App.Features.Employee.Queries.GetByName;
-using ContactWebApi.App.Features.Employee.Queries.GetPage;
+using ContactWebApi.App.Features.Employee.Queries;
 using ContactWebApi.Domain.Enums;
 using ContactWebApi.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 
 
 namespace ContactWebApi.Controllers
@@ -24,25 +24,60 @@ namespace ContactWebApi.Controllers
         }
 
         [HttpGet]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeDto>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         public IAsyncEnumerable<EmployeeDto> GetEmployeesPage([FromQuery] GetEmployeePageRequest request)
         {
             return _Mediator.CreateStream(request);
         }
 
         [HttpGet("{name}")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetEmployeeByName(string name)
         {
             var result = await _Mediator.Send(new GetEmployeeByNameRequest { EmployeeName = name });
             if (result.Count == 0)
-                return NotFound(name);
+                return NotFound();
 
             return Ok(result);
         }
 
+        [HttpGet("id/{id}")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EmployeeDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetEmployeesById(int id)
+        {
+            var result = await _Mediator.Send(new GetEmployeeByIdRequest { EmployeeId = id });
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [HttpGet("group/{id}")]
+        [Produces(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeDto>))]
+        public async IAsyncEnumerable<EmployeeDto> GetEmployeeByGroupId(int id)
+        {
+            var employeeStream = _Mediator.CreateStream(new GetEmployeeByGroupIdRequest { GroupId = id });
+
+            await foreach (var employee in employeeStream)
+                yield return employee;
+        }
+
         [HttpPost]
+        [Consumes("application/json", "application/x-www-form-urlencoded")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         public async Task<IActionResult> ImportEmployees()
         {
-            int result = 0;
+            //ValidationProblem()
+
+            EmployeeImportResult? result = null;
 
             if (Request.HasFormContentType)
             {
@@ -77,7 +112,22 @@ namespace ContactWebApi.Controllers
                 result = await _Mediator.Send(new ImportEmployeeFromStreamRequest(dataType, Request.Body));
             }
 
-            return Ok(result);
+            if (result == null)
+            {
+                // TODO:
+                throw new Exception();
+            }
+
+            var link = Url.ActionLink(action: nameof(GetEmployeeByGroupId), values: new { id = result.GroupId });
+
+            var response = new ImportEmployeeResponse
+            {
+                CreatedCount = result.Count,
+                ResourceUri = new Uri(link!)
+            };
+
+            return CreatedAtAction(nameof(GetEmployeeByGroupId), new { id = result.GroupId }, response);
         }
     }
+
 }

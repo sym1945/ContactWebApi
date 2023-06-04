@@ -1,8 +1,8 @@
 ﻿using MediatR;
 
-namespace ContactWebApi.App.Features.Employee.Commands.Import
+namespace ContactWebApi.App.Features.Employee.Commands
 {
-    public class ImportEmployeeFromTextRequest : IRequest<int>
+    public class ImportEmployeeFromTextRequest : IRequest<EmployeeImportResult>
     {
         public string Text { get; init; }
 

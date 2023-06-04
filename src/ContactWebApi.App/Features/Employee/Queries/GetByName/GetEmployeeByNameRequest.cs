@@ -1,7 +1,7 @@
 ﻿using ContactWebApi.App.Features.Employee.DTOs;
 using MediatR;
 
-namespace ContactWebApi.App.Features.Employee.Queries.GetByName
+namespace ContactWebApi.App.Features.Employee.Queries
 {
     public class GetEmployeeByNameRequest : IRequest<IList<EmployeeDto>>
     {

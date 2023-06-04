@@ -3,9 +3,9 @@ using ContactWebApi.Domain.Enums;
 using MediatR;
 
 
-namespace ContactWebApi.App.Features.Employee.Commands.Import
+namespace ContactWebApi.App.Features.Employee.Commands
 {
-    public class ImportEmployeeFromStreamRequestHandler : IRequestHandler<ImportEmployeeFromStreamRequest, int>
+    public class ImportEmployeeFromStreamRequestHandler : IRequestHandler<ImportEmployeeFromStreamRequest, EmployeeImportResult>
     {
         private readonly IEmployeeImporter _Importer;
 
@@ -14,7 +14,7 @@ namespace ContactWebApi.App.Features.Employee.Commands.Import
             _Importer = importer;
         }
 
-        public async Task<int> Handle(ImportEmployeeFromStreamRequest request, CancellationToken cancellationToken)
+        public async Task<EmployeeImportResult> Handle(ImportEmployeeFromStreamRequest request, CancellationToken cancellationToken)
         {
             // TODO: not suporrted
             if (request.DataType == EImportDataType.Unknown)
@@ -31,7 +31,7 @@ namespace ContactWebApi.App.Features.Employee.Commands.Import
 
             var result = await _Importer.SaveAsync(cancellationToken);
 
-            return result.Count;
+            return result;
         }
     }
 }

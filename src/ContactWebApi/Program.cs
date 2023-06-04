@@ -11,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddDateOnlyStringConverter();
 builder.Services.ConfigureApp(cofiguration);
 builder.Services.ConfigureInfra(cofiguration);
+builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o =>

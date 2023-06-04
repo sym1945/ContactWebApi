@@ -1,6 +1,6 @@
 ﻿using ContactWebApi.App.Features.Employee.DTOs;
 
-namespace ContactWebApi.App.Features.Employee.Commands.Import
+namespace ContactWebApi.App.Features.Employee.Commands
 {
     public interface IEmployeeImporter : IDisposable
     {

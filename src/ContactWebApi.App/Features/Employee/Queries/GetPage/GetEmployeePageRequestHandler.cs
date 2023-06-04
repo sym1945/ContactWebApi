@@ -5,7 +5,7 @@ using ContactWebApi.App.Features.Employee.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ContactWebApi.App.Features.Employee.Queries.GetPage
+namespace ContactWebApi.App.Features.Employee.Queries
 {
     public class GetEmployeePageRequestHandler : IStreamRequestHandler<GetEmployeePageRequest, EmployeeDto>
     {
@@ -24,8 +24,8 @@ namespace ContactWebApi.App.Features.Employee.Queries.GetPage
             // page > 0
             // 0 < pageSize < 100
 
-            int takeCount = request.PageSize;
-            int skipCount = (request.Page - 1) * takeCount;
+            int takeCount = request.PageSize.Value;
+            int skipCount = (request.Page.Value - 1) * takeCount;
 
             return _Context.Employees
                         .AsNoTracking()
