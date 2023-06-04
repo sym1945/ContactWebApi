@@ -1,16 +1,22 @@
 using ContactWebApi.App;
+using ContactWebApi.Extensions;
 using ContactWebApi.Infra;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 var cofiguration = builder.Configuration;
 
 builder.Services.AddControllers();
+builder.Services.AddDateOnlyStringConverter();
 builder.Services.ConfigureApp(cofiguration);
 builder.Services.ConfigureInfra(cofiguration);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(o =>
+    {
+        o.UseDateOnlyStringConverter();
+    });
 
 var app = builder.Build();
 

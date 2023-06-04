@@ -1,4 +1,4 @@
-﻿using ContactWebApi.App.Common.JsonConverters;
+﻿using ContactWebApi.App.Common.Converters;
 using ContactWebApi.App.Features.Employee.DTOs;
 using System.Text.Json;
 
@@ -13,7 +13,7 @@ namespace ContactWebApi.App.Features.Employee.Parsers
 
         static EmployeeJsonParser()
         {
-            _Option.Converters.Add(new DateOnlyConverter());
+            _Option.Converters.Add(new DateOnlyJsonConverter());
         }
 
         public IEnumerable<EmployeeDto> Parse(string text)
