@@ -1,5 +1,6 @@
 ﻿using ContactWebApi.App.Features.Employee.Parsers;
 using ContactWebApi.Domain.Enums;
+using ContactWebApi.Domain.Exceptions;
 using MediatR;
 
 
@@ -16,18 +17,16 @@ namespace ContactWebApi.App.Features.Employee.Commands
 
         public async Task<EmployeeImportResult> Handle(ImportEmployeeFromTextRequest request, CancellationToken cancellationToken)
         {
-            // TODO: not suporrted
             if (request.DataType == EImportDataType.Unknown)
-                throw new Exception();
+                throw new NotSupportedImportDataType();
 
             var validator = new EmployeeDtoValidator();
             var parser = new EmployeeParser(request.DataType);
 
             foreach (var employee in parser.Parse(request.Text))
             {
-                // TODO: employee validataion
                 if (!validator.IsValid(employee))
-                    throw new Exception();
+                    throw new RequestModelInvalidException();
 
                 await _Importer.AddAsync(employee, cancellationToken);
             }

@@ -46,19 +46,11 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
         public async Task<EmployeeImportResult> SaveAsync(CancellationToken cancelToken = default)
         {
             if (_Group == null || _FilePath == null)
-            {
-                // TODO:
-                throw new Exception();
-            }
+                throw new NullReferenceException("Group or File is not created");
 
             _Writer?.Close();
 
-            var formatFilePath = Path.Combine(AppContext.BaseDirectory, @"Resources\Infra\Employees.fmt");
-            var database = _Context.Database.GetDbConnection().Database;
-            var schema = _Context.Employees.EntityType.GetSchema() ?? "dbo";
-            var table = _Context.Employees.EntityType.GetTableName();
-
-            var query = @$"BULK INSERT [{database}].[{schema}].[{table}] FROM '{_FilePath}' WITH (FORMATFILE = '{formatFilePath}')";
+            var query = CreateBulkInsertQuery();
 
             var count = await _Context.Database.ExecuteSqlRawAsync(query, cancelToken);
 
@@ -90,6 +82,16 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
             catch
             {
             }
+        }
+
+        private string CreateBulkInsertQuery()
+        {
+            var formatFilePath = Path.Combine(AppContext.BaseDirectory, @"Resources\Infra\Employees.fmt");
+            var database = _Context.Database.GetDbConnection().Database;
+            var schema = _Context.Employees.EntityType.GetSchema() ?? "dbo";
+            var table = _Context.Employees.EntityType.GetTableName();
+
+            return @$"BULK INSERT [{database}].[{schema}].[{table}] FROM '{_FilePath}' WITH (FORMATFILE = '{formatFilePath}')";
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿using ContactWebApi.Constants;
 using ContactWebApi.Domain.Enums;
+using ContactWebApi.Domain.Exceptions;
 
 namespace ContactWebApi.Helpers
 {
@@ -11,7 +12,7 @@ namespace ContactWebApi.Helpers
             {
                 case ContentTypes.ApplicationJson: return EImportDataType.Json;
                 case ContentTypes.TextCsv: return EImportDataType.Csv;
-                default: return EImportDataType.Unknown;
+                default: throw new NotSupportedImportDataType();
             }
         }
 

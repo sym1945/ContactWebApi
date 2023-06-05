@@ -1,5 +1,6 @@
 using ContactWebApi.App;
 using ContactWebApi.Extensions;
+using ContactWebApi.Filters.Actions;
 using ContactWebApi.Infra;
 
 
@@ -7,7 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 var cofiguration = builder.Configuration;
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(o => 
+    {
+        o.AddActionFilter<ImportDataTypeActionFilter>(builder.Services);
+    });
+
 builder.Services.AddDateOnlyStringConverter();
 builder.Services.ConfigureApp(cofiguration);
 builder.Services.ConfigureInfra(cofiguration);
@@ -28,8 +33,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
+app.UseExceptionMiddleware();
 
 app.MapControllers();
 

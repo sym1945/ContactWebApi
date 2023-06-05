@@ -1,5 +1,6 @@
 ﻿using ContactWebApi.App.Features.Employee.DTOs;
 using ContactWebApi.Domain.Enums;
+using ContactWebApi.Domain.Exceptions;
 
 namespace ContactWebApi.App.Features.Employee.Parsers
 {
@@ -19,12 +20,28 @@ namespace ContactWebApi.App.Features.Employee.Parsers
 
         public IEnumerable<EmployeeDto> Parse(string text)
         {
-            return _Parser.Parse(text);
+            try
+            {
+                return _Parser.Parse(text);
+            }
+            catch
+            {
+                throw new RequestModelInvalidException();
+            }
+            
         }
 
         public IAsyncEnumerable<EmployeeDto> Parse(Stream stream)
         {
-            return _Parser.Parse(stream);
+            try
+            {
+                return _Parser.Parse(stream);
+            }
+            catch (Exception)
+            {
+                throw new RequestModelInvalidException();
+            }
         }
+
     }
 }

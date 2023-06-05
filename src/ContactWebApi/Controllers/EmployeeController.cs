@@ -4,6 +4,7 @@ using ContactWebApi.App.Features.Employee.Queries;
 using ContactWebApi.Attributes;
 using ContactWebApi.Constants;
 using ContactWebApi.Domain.Enums;
+using ContactWebApi.Domain.Exceptions;
 using ContactWebApi.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace ContactWebApi.Controllers
         public async Task<IActionResult> GetEmployeesPage([FromQuery] GetEmployeePageRequest request)
         {
             request.SetPageUriCreator(new PageUriCreator((page, pageSize) =>
-                new Uri(Url.ActionLink(action: nameof(GetEmployeesPage), values: new { page, pageSize})!)
+                new Uri(Url.ActionLink(action: nameof(GetEmployeesPage), values: new { page, pageSize })!)
             ));
 
             var result = await _Mediator.Send(request);
@@ -94,8 +95,8 @@ namespace ContactWebApi.Controllers
         public async Task<IActionResult> ImportEmployees()
         {
             EmployeeImportResult? result = null;
-            string? contentType = null;
             Stream? stream = null;
+            string? contentType = null;
             string text = string.Empty;
 
             if (Request.HasFormContentType)
@@ -124,8 +125,6 @@ namespace ContactWebApi.Controllers
             {
                 // stream에서 데이터 parse
                 var dataType = ImportDataTypeConverter.CovertFrom(contentType);
-                if (dataType == EImportDataType.Unknown)
-                    return StatusCode(415);
 
                 result = await _Mediator.Send(new ImportEmployeeFromStreamRequest(dataType, stream));
             }
@@ -134,22 +133,15 @@ namespace ContactWebApi.Controllers
                 // text에서 데이터 parse. text 형식 모르니 Json -> Csv 순서로 검사
                 try
                 {
-                    result = await _Mediator.Send(new ImportEmployeeFromTextRequest(EImportDataType.Json, text));
+                    if (text.IndexOf('[') > 0)
+                        result = await _Mediator.Send(new ImportEmployeeFromTextRequest(EImportDataType.Json, text));
                 }
-                catch
+                catch (RequestModelInvalidException)
                 {
-                    // TODO: ...
                 }
 
-                try
-                {
+                if (result == null)
                     result = await _Mediator.Send(new ImportEmployeeFromTextRequest(EImportDataType.Csv, text));
-                }
-                catch
-                {
-                    // TODO: ...
-                    return StatusCode(415);
-                }
             }
 
             var resourceUri = new Uri(Url.ActionLink(action: nameof(GetEmployeesByGroupId), values: new { id = result.GroupId })!);
