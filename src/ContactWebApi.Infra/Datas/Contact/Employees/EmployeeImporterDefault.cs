@@ -38,7 +38,7 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
         public async Task<EmployeeImportResult> SaveAsync(CancellationToken cancelToken = default)
         {
             if (_Group == null)
-                throw new NullReferenceException("Group is not created");
+                return new EmployeeImportResult(0, 0);
 
             var count = await _Context.SaveChangesAsync(cancelToken);
 

@@ -20,9 +20,7 @@ namespace ContactWebApi.App.Features.Employee.Parsers
 
             while (csv.Read())
             {
-                var employee = ToRecord(csv);
-
-                yield return employee;
+                yield return ToRecord(csv);
             }
         }
 
@@ -35,9 +33,7 @@ namespace ContactWebApi.App.Features.Employee.Parsers
 
             while (await csv.ReadAsync())
             {
-                var employee = ToRecord(csv);
-
-                yield return employee;
+                yield return ToRecord(csv);
             }
         }
 

@@ -14,13 +14,24 @@ namespace ContactWebApi.Filters.Actions
             , Constants.ContentTypes.TextCsv
         };
 
+        private static bool Contains(string? contentType)
+        {
+            if (contentType == null)
+                return false;
+
+            foreach (var supportedContentType in _SupportedContentTypes)
+            {
+                if (contentType.StartsWith(supportedContentType))
+                    return true;
+            }
+                
+            return false;
+        }
+
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var contentType = context.HttpContext.Request.ContentType;
-
-            if (contentType == null
-                || !_SupportedContentTypes.Contains(contentType))
+            if (!Contains(context.HttpContext.Request.ContentType))
             {
                 throw new NotSupportedImportDataType();
             }

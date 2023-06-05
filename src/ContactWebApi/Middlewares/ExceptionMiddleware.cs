@@ -12,13 +12,13 @@ namespace ContactWebApi.Middlewares
     {
         private readonly RequestDelegate _Next;
         private readonly ProblemDetailsFactory _ProblemDetailsFactory;
-        private readonly ILoggerFactory _LoggerFactory;
+        private readonly ILogger<ExceptionMiddleware> _Logger;
 
-        public ExceptionMiddleware(RequestDelegate next, ProblemDetailsFactory problemDetailsFactory, ILoggerFactory loggerFactory)
+        public ExceptionMiddleware(RequestDelegate next, ProblemDetailsFactory problemDetailsFactory, ILogger<ExceptionMiddleware> logger)
         {
             _Next = next;
             _ProblemDetailsFactory = problemDetailsFactory;
-            _LoggerFactory = loggerFactory;
+            _Logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -29,9 +29,6 @@ namespace ContactWebApi.Middlewares
             }
             catch (Exception ex)
             {
-                var logger = _LoggerFactory.CreateLogger(nameof(ExceptionMiddleware));
-
-                logger.LogError($"Something went wrong: {ex}");
                 await HandleExceptionAsync(context, ex);
             }
         }
@@ -40,21 +37,44 @@ namespace ContactWebApi.Middlewares
         {
             ProblemDetails? problemDetails = null;
 
-            if (exception is NotSupportedImportDataType)
+            switch (exception)
             {
-                problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
-                    httpContext: context,
-                    statusCode: (int)HttpStatusCode.UnsupportedMediaType,
-                    title: "Media type is not supported"
-                );
-            }
-            else
-            {
-                problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
-                    httpContext: context,
-                    statusCode: (int)HttpStatusCode.InternalServerError,
-                    title: "Internal Server Error from the custom middleware."
-                );
+                case NotSupportedImportDataType e:
+                    {
+                        problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
+                            httpContext: context,
+                            statusCode: (int)HttpStatusCode.UnsupportedMediaType,
+                            title: nameof(NotSupportedImportDataType)
+                        );
+                        break;
+                    }
+                case RequestModelInvalidException e:
+                    {
+                        problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
+                            httpContext: context,
+                            statusCode: (int)HttpStatusCode.BadRequest,
+                            title: nameof(RequestModelInvalidException)
+                        );
+                        break;
+                    }
+                case DuplicatedRecordException e:
+                    {
+                        problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
+                            httpContext: context,
+                            statusCode: (int)HttpStatusCode.Conflict,
+                            title: nameof(DuplicatedRecordException)
+                        );
+                        break;
+                    }
+                default:
+                    {
+                        problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
+                            httpContext: context,
+                            statusCode: (int)HttpStatusCode.InternalServerError,
+                            title: "Internal Server Error"
+                        );
+                        break;
+                    }
             }
 
             context.Response.ContentType = ContentTypes.ApplicationJson;

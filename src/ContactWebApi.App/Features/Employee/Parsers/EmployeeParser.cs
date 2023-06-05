@@ -2,6 +2,7 @@
 using ContactWebApi.Domain.Enums;
 using ContactWebApi.Domain.Exceptions;
 
+
 namespace ContactWebApi.App.Features.Employee.Parsers
 {
     public class EmployeeParser : IEmployeeParser
@@ -20,27 +21,46 @@ namespace ContactWebApi.App.Features.Employee.Parsers
 
         public IEnumerable<EmployeeDto> Parse(string text)
         {
-            try
+            var has = true;
+            var enumerator = _Parser.Parse(text).GetEnumerator();
+
+            do
             {
-                return _Parser.Parse(text);
+                try
+                {
+                    has = enumerator.MoveNext();
+                }
+                catch
+                {
+                    throw new RequestModelInvalidException();
+                }
+
+                if (has)
+                    yield return enumerator.Current;
             }
-            catch
-            {
-                throw new RequestModelInvalidException();
-            }
-            
+            while (has);
         }
 
-        public IAsyncEnumerable<EmployeeDto> Parse(Stream stream)
+        public async IAsyncEnumerable<EmployeeDto> Parse(Stream stream)
         {
-            try
+            var has = true;
+            var enumerator = _Parser.Parse(stream).GetAsyncEnumerator();
+
+            do
             {
-                return _Parser.Parse(stream);
+                try
+                {
+                    has = await enumerator.MoveNextAsync();
+                }
+                catch
+                {
+                    throw new RequestModelInvalidException();
+                }
+
+                if (has)
+                    yield return enumerator.Current;
             }
-            catch (Exception)
-            {
-                throw new RequestModelInvalidException();
-            }
+            while (has);
         }
 
     }

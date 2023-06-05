@@ -8,11 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var cofiguration = builder.Configuration;
 
-builder.Services.AddControllers(o =>
-    {
-        o.Filters.Add<ImportDataTypeActionFilter>();
-    });
-
+builder.Services.AddControllers();
 builder.Services.AddScoped<ImportDataTypeActionFilter>();
 builder.Services.AddDateOnlyStringConverter();
 builder.Services.ConfigureApp(cofiguration);

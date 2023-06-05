@@ -46,7 +46,7 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
         public async Task<EmployeeImportResult> SaveAsync(CancellationToken cancelToken = default)
         {
             if (_Group == null || _FilePath == null)
-                throw new NullReferenceException("Group or File is not created");
+                return new EmployeeImportResult(0, 0);
 
             _Writer?.Close();
 

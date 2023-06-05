@@ -90,6 +90,7 @@ namespace ContactWebApi.Controllers
         [ImportEmployeesConsumes]
         [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ImportEmployeeResponse))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
         public async Task<IActionResult> ImportEmployees()
@@ -133,7 +134,7 @@ namespace ContactWebApi.Controllers
                 // text에서 데이터 parse. text 형식 모르니 Json -> Csv 순서로 검사
                 try
                 {
-                    if (text.IndexOf('[') > 0)
+                    if (text.IndexOf('[') >= 0)
                         result = await _Mediator.Send(new ImportEmployeeFromTextRequest(EImportDataType.Json, text));
                 }
                 catch (RequestModelInvalidException)
@@ -143,6 +144,9 @@ namespace ContactWebApi.Controllers
                 if (result == null)
                     result = await _Mediator.Send(new ImportEmployeeFromTextRequest(EImportDataType.Csv, text));
             }
+
+            if (result.Count == 0)
+                return NoContent();
 
             var resourceUri = new Uri(Url.ActionLink(action: nameof(GetEmployeesByGroupId), values: new { id = result.GroupId })!);
 
