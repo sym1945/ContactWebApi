@@ -8,8 +8,7 @@ namespace ContactWebApi.App.Features.Employee.Mappers
         public EmployeeEntityMapper()
         {
             CreateMap<EmployeeDto, Domain.Entities.Employee>()
-                .ForMember(target => target.Joined, option => option.MapFrom(source => source.Joined.ToDateTime(TimeOnly.MinValue)));
+                .ForMember(target => target.Joined, option => option.MapFrom(source => source.Joined.GetValueOrDefault().ToDateTime(TimeOnly.MinValue)));
         }
-
     }
 }

@@ -47,9 +47,9 @@ namespace ContactWebApi.App.Features.Employee.Commands
             }
             // Joined
             field = nameof(model.Joined);
-            if (model.Joined == DateOnly.MinValue)
+            if (!model.Joined.HasValue)
             {
-                AddErrorWrongData(field, model.Joined.ToString("O"));
+                AddErrorWrongData(field);
             }
 
             errors = _Errors.ToArray();

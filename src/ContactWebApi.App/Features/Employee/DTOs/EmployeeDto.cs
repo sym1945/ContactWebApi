@@ -6,6 +6,6 @@
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Tel { get; set; } = string.Empty;
-        public DateOnly Joined { get; set; }
+        public DateOnly? Joined { get; set; }
     }
 }

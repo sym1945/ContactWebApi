@@ -44,7 +44,7 @@ namespace ContactWebApi.App.Features.Employee.Parsers
                 Name = csv.GetString(0),
                 Email = csv.GetString(1),
                 Tel = csv.GetString(2).FormatTel(),
-                Joined = csv.GetDate(3),
+                Joined = csv.GetDateNullable(3),
             };
 
             return record;
