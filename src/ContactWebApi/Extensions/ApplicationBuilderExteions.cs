@@ -1,7 +1,4 @@
 ﻿using ContactWebApi.Middlewares;
-using Microsoft.AspNetCore.Diagnostics;
-using System.Net;
-using System.Text.Json;
 
 namespace ContactWebApi.Extensions
 {

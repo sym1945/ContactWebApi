@@ -7,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 var cofiguration = builder.Configuration;
 
+builder.RegisterSerilog();
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<ImportDataTypeActionFilter>();
 builder.Services.AddDateOnlyStringConverter();

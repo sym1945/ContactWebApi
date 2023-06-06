@@ -32,6 +32,8 @@ namespace ContactWebApi.Middlewares
             }
             catch (Exception ex)
             {
+                _Logger.LogError(ex, ex.Message);
+
                 await HandleExceptionAsync(context, ex);
             }
         }
