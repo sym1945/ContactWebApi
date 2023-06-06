@@ -11,7 +11,7 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
 {
     public class EmployeeImporterMssql : IEmployeeImporter
     {
-        private readonly ILogger<EmployeeImporterMssql> _Logger;
+        private readonly ILogger<EmployeeImporterMssql>? _Logger;
         private readonly ContactDbContext _Context;
 
         private string? _FilePath;
@@ -19,7 +19,7 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
         private StreamWriter? _Writer;
         private IDbContextTransaction? _Transaction;
 
-        public EmployeeImporterMssql(ContactDbContext context, ILogger<EmployeeImporterMssql> logger)
+        public EmployeeImporterMssql(ContactDbContext context, ILogger<EmployeeImporterMssql>? logger = null)
         {
             _Context = context;
             _Logger = logger;
@@ -30,7 +30,7 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
             // TODO: Thread-safe...
             if (_Group == null)
             {
-                _Transaction = await _Context.Database.BeginTransactionAsync();
+                _Transaction = await _Context.Database.BeginTransactionAsync(cancelToken);
                 _Group = await _Context.CreateEmployeeGroupAsync(cancelToken);
             }
 
@@ -40,7 +40,7 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
                 _Writer = new StreamWriter(_FilePath, false, Encoding.Unicode);
             }
 
-            await _Writer.WriteLineAsync($"{employee.Name}\t{employee.Email}\t{employee.Tel}\t{employee.Joined.ToString("yyyy-MM-dd")}\t{_Group.Id}");
+            await _Writer.WriteLineAsync($"{employee.Name}\t{employee.Email}\t{employee.Tel}\t{employee.Joined:yyyy-MM-dd}\t{_Group.Id}");
         }
 
         public async Task<EmployeeImportResult> SaveAsync(CancellationToken cancelToken = default)
@@ -55,7 +55,7 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
             var count = await _Context.Database.ExecuteSqlRawAsync(query, cancelToken);
 
             if (count > 0 && _Transaction != null)
-                await _Transaction.CommitAsync();
+                await _Transaction.CommitAsync(cancelToken);
 
             return new EmployeeImportResult(_Group.Id, count);
         }

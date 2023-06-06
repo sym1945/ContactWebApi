@@ -1,6 +1,6 @@
-﻿#define USE_INMEMORY
-
+﻿using ContactWebApi.App.Common.Extensions;
 using ContactWebApi.App.Common.Interfaces;
+using ContactWebApi.App.Common.Options;
 using ContactWebApi.Infra.Datas.Contact;
 using ContactWebApi.Infra.Datas.Contact.Employees;
 using ContactWebApi.Infra.Extensions;
@@ -16,33 +16,43 @@ namespace ContactWebApi.Infra
     {
         public static IServiceCollection ConfigureInfra(this IServiceCollection services, IConfiguration config)
         {
-#if USE_INMEMORY
-            var connectionString = "DataSource=ContactDb;mode=memory;cache=shared";
-            var keepAliveConnection = new SqliteConnection(connectionString);
-            keepAliveConnection.Open();
+            //services.AddOptions<ContactDbOption>(ContactDbOption.Key).Bind(config);
 
-            services.AddSingleton(keepAliveConnection);
+            var contactDbOption = config.GetSection(ContactDbOption.Key).Get<ContactDbOption>();
 
-            services.AddDbContext<ContactDbContext>(options =>
+            if (contactDbOption == null || StringExtensions.IsNullOrEmptyOrWhiteSpace(contactDbOption.ConnectionString))
             {
-                options.UseSqlite(connectionString);
-            });
+                // Use SQLite memory
+                var connectionString = "DataSource=ContactDb;mode=memory;cache=shared";
+                var keepAliveConnection = new SqliteConnection(connectionString);
+                keepAliveConnection.Open();
 
-            services.AddEmployeeImporter<EmployeeImporterDefault>();
+                services.AddSingleton(keepAliveConnection);
 
-#else
-            services.AddDbContext<ContactDbContext>(options =>
+                services.AddDbContext<ContactDbContext>(options =>
+                {
+                    options.UseSqlite(connectionString);
+                });
+
+                services.AddEmployeeImporter<EmployeeImporterDefault>();
+            }
+            else
             {
-                options.UseSqlServer("Server=.;AttachDbFilename=D:\\Datas\\ContactDb.mdf;Database=ContactDb;Trusted_Connection=Yes;Encrypt=False");
-            });
+                // Use MS-SQL
+                services.AddDbContext<ContactDbContext>(options =>
+                {
+                    options.UseSqlServer(contactDbOption.ConnectionString);
+                });
 
-            services.AddEmployeeImporter<EmployeeImporterMssql>();
-#endif
+                if (contactDbOption.UseBulkInsert)
+                    services.AddEmployeeImporter<EmployeeImporterMssql>();
+                else
+                    services.AddEmployeeImporter<EmployeeImporterDefault>();
+            }
 
             services.AddTransient<IContactDbContext>(provider =>
                 provider.GetRequiredService<ContactDbContext>()
             );
-
 
             return services;
         }

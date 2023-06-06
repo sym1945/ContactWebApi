@@ -6,6 +6,7 @@ using ContactWebApi.Constants;
 using ContactWebApi.Domain.Enums;
 using ContactWebApi.Domain.Exceptions;
 using ContactWebApi.Helpers;
+using ContactWebApi.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

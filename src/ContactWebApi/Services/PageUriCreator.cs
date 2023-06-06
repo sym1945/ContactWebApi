@@ -1,6 +1,6 @@
 ﻿using ContactWebApi.App.Common.Interfaces;
 
-namespace ContactWebApi.Helpers
+namespace ContactWebApi.Services
 {
     public class PageUriCreator : IPageUriCreator
     {

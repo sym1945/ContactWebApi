@@ -1,4 +1,5 @@
-﻿using ContactWebApi.App.Features.Employee.Commands;
+﻿using AutoMapper;
+using ContactWebApi.App.Features.Employee.Commands;
 using ContactWebApi.App.Features.Employee.DTOs;
 using ContactWebApi.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -8,12 +9,15 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
     public class EmployeeImporterDefault : IEmployeeImporter
     {
         private readonly ContactDbContext _Context;
+        private readonly IMapper _Mapper;
         private EmployeeGroup? _Group;
         private IDbContextTransaction? _Transaction;
+        
 
-        public EmployeeImporterDefault(ContactDbContext context)
+        public EmployeeImporterDefault(ContactDbContext context, IMapper mapper)
         {
             _Context = context;
+            _Mapper = mapper;
         }
 
         public async Task AddAsync(EmployeeDto employee, CancellationToken cancelToken = default)
@@ -21,18 +25,14 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
             // TODO: Thread-safe...
             if (_Group == null)
             {
-                _Transaction = await _Context.Database.BeginTransactionAsync();
+                _Transaction = await _Context.Database.BeginTransactionAsync(cancelToken);
                 _Group = await _Context.CreateEmployeeGroupAsync(cancelToken);
             }
 
-            await _Context.Employees.AddAsync(new Employee
-            {
-                Name = employee.Name,
-                Email = employee.Email,
-                Tel = employee.Tel,
-                Joined = employee.Joined.ToDateTime(TimeOnly.MinValue),
-                GroupId = _Group.Id
-            });
+            var entity = _Mapper.Map<Employee>(employee);
+            entity.GroupId = _Group.Id;
+
+            await _Context.Employees.AddAsync(entity);
         }
 
         public async Task<EmployeeImportResult> SaveAsync(CancellationToken cancelToken = default)
@@ -43,7 +43,7 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
             var count = await _Context.SaveChangesAsync(cancelToken);
 
             if (count > 0 && _Transaction != null)
-                await _Transaction.CommitAsync();
+                await _Transaction.CommitAsync(cancelToken);
 
             return new EmployeeImportResult(_Group.Id, count);
         }
