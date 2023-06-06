@@ -11,6 +11,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactWebApi.Domain", "Con
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactWebApi.Infra", "ContactWebApi.Infra\ContactWebApi.Infra.csproj", "{F8C5B115-CAE3-4792-B09B-62D7C7C32373}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{12B8CBF8-2756-43E6-8B36-6E1B4A522E8D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{97AE9263-66BB-40A8-A2A1-023987C3B647}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BF1EA288-1EF9-416A-81B1-B00142B1DD20}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitattributes = ..\.gitattributes
+		..\.gitignore = ..\.gitignore
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +47,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4FAE9DD4-8BE0-4C39-AEBD-273933509F27} = {12B8CBF8-2756-43E6-8B36-6E1B4A522E8D}
+		{2A7258D0-98F3-45E7-8316-E8F9B166BF1A} = {12B8CBF8-2756-43E6-8B36-6E1B4A522E8D}
+		{8B3123B0-BF69-4E5E-853F-FF044F1EC7AE} = {12B8CBF8-2756-43E6-8B36-6E1B4A522E8D}
+		{F8C5B115-CAE3-4792-B09B-62D7C7C32373} = {12B8CBF8-2756-43E6-8B36-6E1B4A522E8D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {97820304-F206-4555-AA4E-8F5B4BEE5252}
