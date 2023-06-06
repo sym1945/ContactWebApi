@@ -59,7 +59,7 @@ namespace ContactWebApi.Middlewares
                         var modelStateMap = new ModelStateDictionary();
 
                         foreach (var modelError in e.ModelErrors)
-                            modelStateMap.AddModelError(modelError.Key, modelError.Value);
+                            modelStateMap.AddModelError(modelError.Name, modelError.Description);
 
                         problemDetails = _ProblemDetailsFactory.CreateValidationProblemDetails(
                             httpContext: context,

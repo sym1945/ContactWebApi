@@ -30,7 +30,7 @@ namespace ContactWebApi.App.Features.Employee.Queries
             {
                 AddErrorRequired(field);
             }
-            else if (model.PageSize < PageMin && model.PageSize > PageMax)
+            else if (model.PageSize < PageMin || model.PageSize > PageMax)
             {
                 AddErrorRange(field, PageMin, PageMax);
             }
