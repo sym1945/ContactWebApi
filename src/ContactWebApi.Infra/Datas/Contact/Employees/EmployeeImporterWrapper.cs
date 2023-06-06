@@ -31,25 +31,30 @@ namespace ContactWebApi.Infra.Datas.Contact.Employees
             }
             catch (SqlException se) when (se.Number == MssqlErrorCode.CannotInsertDuplicatedWithUniqueIndex)
             {
-                throw new DuplicatedRecordException();
+                throw CreateException();
             }
             catch (SqliteException se) when (se.SqliteExtendedErrorCode == SqliteErrorCode.SQLITE_CONSTRAINT_UNIQUE)
             {
-                throw new DuplicatedRecordException();
+                throw CreateException();
             }
             catch (Exception ex) when (ex.InnerException is SqlException se && se.Number == MssqlErrorCode.CannotInsertDuplicatedWithUniqueIndex)
             {
-                throw new DuplicatedRecordException();
+                throw CreateException();
             }
             catch (Exception ex) when (ex.InnerException is SqliteException se && se.SqliteExtendedErrorCode == SqliteErrorCode.SQLITE_CONSTRAINT_UNIQUE)
             {
-                throw new DuplicatedRecordException();
+                throw CreateException();
             }
         }
 
         public ValueTask DisposeAsync()
         {
             return _Importer.DisposeAsync();
+        }
+
+        private static DuplicatedRecordException CreateException()
+        {
+            return new DuplicatedRecordException("Email or Tel number is already registered.");
         }
     }
 }

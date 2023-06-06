@@ -138,7 +138,7 @@ namespace ContactWebApi.Controllers
                     if (text.IndexOf('[') >= 0)
                         result = await _Mediator.Send(new ImportEmployeeFromTextRequest(EImportDataType.Json, text));
                 }
-                catch (RequestModelInvalidException)
+                catch (InvalidModelException)
                 {
                 }
 

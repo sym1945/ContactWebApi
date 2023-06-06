@@ -1,12 +1,11 @@
 ﻿using ContactWebApi.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-
 namespace ContactWebApi.Filters.Actions
 {
     public class ImportDataTypeActionFilter : IAsyncActionFilter
     {
-        private static readonly HashSet<string> _SupportedContentTypes = new HashSet<string>
+        public static readonly string[] SupportedContentTypes = new string[]
         {
             Constants.ContentTypes.ApplicationJson
             , Constants.ContentTypes.ApplicationWwwFormUrlEncoded
@@ -19,21 +18,16 @@ namespace ContactWebApi.Filters.Actions
             if (contentType == null)
                 return false;
 
-            foreach (var supportedContentType in _SupportedContentTypes)
-            {
-                if (contentType.StartsWith(supportedContentType))
-                    return true;
-            }
-                
-            return false;
+            return SupportedContentTypes.Any(x => contentType.StartsWith(x));
         }
-
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (!Contains(context.HttpContext.Request.ContentType))
+            var contentType = context.HttpContext.Request.ContentType;
+
+            if (!Contains(contentType))
             {
-                throw new NotSupportedImportDataType();
+                throw new UnsupportedImportContentTypeException(contentType, SupportedContentTypes);
             }
 
             await next();

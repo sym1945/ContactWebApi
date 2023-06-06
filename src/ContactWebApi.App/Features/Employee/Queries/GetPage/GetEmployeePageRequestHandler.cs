@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using ContactWebApi.App.Common.Interfaces;
 using ContactWebApi.App.Features.Employee.DTOs;
 using ContactWebApi.Domain.Exceptions;
+using ContactWebApi.Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,8 +23,8 @@ namespace ContactWebApi.App.Features.Employee.Queries
         public async Task<GetEmployeePageResponse> Handle(GetEmployeePageRequest request, CancellationToken cancellationToken)
         {
             var validator = new GetEmployeePageRequestValidator();
-            if (!validator.IsValid(request))
-                throw new RequestModelInvalidException();
+            if (!validator.IsValid(request, out ModelError[] errors))
+                throw new InvalidModelException(modelErrors: errors);
 
             var pageNo = request.Page!.Value;
             var pageSize = request.PageSize!.Value;

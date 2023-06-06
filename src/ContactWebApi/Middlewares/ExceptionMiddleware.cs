@@ -2,9 +2,9 @@
 using ContactWebApi.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Net;
 using System.Text.Json;
-
 
 namespace ContactWebApi.Middlewares
 {
@@ -12,12 +12,15 @@ namespace ContactWebApi.Middlewares
     {
         private readonly RequestDelegate _Next;
         private readonly ProblemDetailsFactory _ProblemDetailsFactory;
+        private readonly IHostEnvironment _Environment;
         private readonly ILogger<ExceptionMiddleware> _Logger;
 
-        public ExceptionMiddleware(RequestDelegate next, ProblemDetailsFactory problemDetailsFactory, ILogger<ExceptionMiddleware> logger)
+
+        public ExceptionMiddleware(RequestDelegate next, ProblemDetailsFactory problemDetailsFactory, IHostEnvironment environment, ILogger<ExceptionMiddleware> logger)
         {
             _Next = next;
             _ProblemDetailsFactory = problemDetailsFactory;
+            _Environment = environment;
             _Logger = logger;
         }
 
@@ -39,21 +42,29 @@ namespace ContactWebApi.Middlewares
 
             switch (exception)
             {
-                case NotSupportedImportDataType e:
+                case UnsupportedImportContentTypeException e:
                     {
                         problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
                             httpContext: context,
                             statusCode: (int)HttpStatusCode.UnsupportedMediaType,
-                            title: nameof(NotSupportedImportDataType)
+                            title: nameof(UnsupportedImportContentTypeException),
+                            detail: e.Message
                         );
                         break;
                     }
-                case RequestModelInvalidException e:
+                case InvalidModelException e:
                     {
-                        problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
+                        var modelStateMap = new ModelStateDictionary();
+
+                        foreach (var modelError in e.ModelErrors)
+                            modelStateMap.AddModelError(modelError.Key, modelError.Value);
+
+                        problemDetails = _ProblemDetailsFactory.CreateValidationProblemDetails(
                             httpContext: context,
+                            modelStateDictionary: modelStateMap,
                             statusCode: (int)HttpStatusCode.BadRequest,
-                            title: nameof(RequestModelInvalidException)
+                            title: nameof(InvalidModelException),
+                            detail: e.Message
                         );
                         break;
                     }
@@ -62,7 +73,8 @@ namespace ContactWebApi.Middlewares
                         problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
                             httpContext: context,
                             statusCode: (int)HttpStatusCode.Conflict,
-                            title: nameof(DuplicatedRecordException)
+                            title: nameof(DuplicatedRecordException),
+                            detail: e.Message
                         );
                         break;
                     }
@@ -71,7 +83,8 @@ namespace ContactWebApi.Middlewares
                         problemDetails = _ProblemDetailsFactory.CreateProblemDetails(
                             httpContext: context,
                             statusCode: (int)HttpStatusCode.InternalServerError,
-                            title: "Internal Server Error"
+                            title: "Internal Server Error",
+                            detail: _Environment.IsDevelopment() ? exception.Message : null
                         );
                         break;
                     }
@@ -80,9 +93,12 @@ namespace ContactWebApi.Middlewares
             context.Response.ContentType = ContentTypes.ApplicationJson;
             context.Response.StatusCode = problemDetails.Status.GetValueOrDefault();
 
-            await context.Response.WriteAsync(JsonSerializer.Serialize(problemDetails));
+            await context.Response.WriteAsync(problemDetails switch
+            {
+                ValidationProblemDetails vpd => JsonSerializer.Serialize(vpd),
+                _ => JsonSerializer.Serialize(problemDetails)
+            });
         }
-
 
     }
 }

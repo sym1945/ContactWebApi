@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using ContactWebApi.App.Features.Employee.DTOs;
 
-
 namespace ContactWebApi.App.Features.Employee.Mappers
 {
     public class EmployeeEntityMapper : Profile

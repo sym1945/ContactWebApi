@@ -1,16 +1,19 @@
 ﻿using ContactWebApi.App.Features.Employee.DTOs;
 using ContactWebApi.Domain.Enums;
 using ContactWebApi.Domain.Exceptions;
-
+using ContactWebApi.Domain.Models;
 
 namespace ContactWebApi.App.Features.Employee.Parsers
 {
     public class EmployeeParser : IEmployeeParser
     {
+        private readonly EImportDataType _DataType;
         private readonly IEmployeeParser _Parser;
 
         public EmployeeParser(EImportDataType dataType)
         {
+            _DataType = dataType;
+
             switch (dataType)
             {
                 case EImportDataType.Csv: _Parser = new EmployeeCsvParser(); break;
@@ -32,7 +35,7 @@ namespace ContactWebApi.App.Features.Employee.Parsers
                 }
                 catch
                 {
-                    throw new RequestModelInvalidException();
+                    throw CreateException(_DataType);
                 }
 
                 if (has)
@@ -54,13 +57,18 @@ namespace ContactWebApi.App.Features.Employee.Parsers
                 }
                 catch
                 {
-                    throw new RequestModelInvalidException();
+                    throw CreateException(_DataType);
                 }
 
                 if (has)
                     yield return enumerator.Current;
             }
             while (has);
+        }
+
+        private static InvalidModelException CreateException(EImportDataType dataType)
+        {
+            return new InvalidModelException(modelErrors: new ModelError("DataFormat", $"Invalid '{dataType}' format"));
         }
 
     }
