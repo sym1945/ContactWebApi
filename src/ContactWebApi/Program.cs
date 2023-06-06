@@ -3,7 +3,6 @@ using ContactWebApi.Extensions;
 using ContactWebApi.Filters.Actions;
 using ContactWebApi.Infra;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 var cofiguration = builder.Configuration;
@@ -19,6 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o =>
     {
         o.UseDateOnlyStringConverter();
+        o.IncludeXmlComments();
     });
 
 var app = builder.Build();

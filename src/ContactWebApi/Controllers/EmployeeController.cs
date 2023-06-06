@@ -26,6 +26,15 @@ namespace ContactWebApi.Controllers
             _Logger = logger;
         }
 
+        /// <summary>
+        /// Employee 페이지 조회
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// </remarks>
+        /// <response code="200">Employee 페이지 정보 리턴</response>
+        /// <response code="400">page 필드가 존재하지 않거나 1보다 작을때 또는, pageSize 필드가 존재하지 않거나 1 ~ 100 사이의 값이 아님</response>
         [HttpGet]
         [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetEmployeePageResponse))]
@@ -41,6 +50,17 @@ namespace ContactWebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Employee 이름으로 조회
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// 동명이인을 고려하여 배열로 반환
+        /// </remarks>
+        /// <response code="200">Employee 정보 리턴 (배열)</response>
+        /// <response code="400">유효하지 않은 name 값</response>
+        /// <response code="404">name과 일치하는 Employee가 존재하지 않음</response>
         [HttpGet("{name}")]
         [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeLinkDto>))]
@@ -61,6 +81,16 @@ namespace ContactWebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Employee Id로 조회
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// </remarks>
+        /// <response code="200">Employee 정보 리턴</response>
+        /// <response code="400">유효하지 않은 Id 값</response>
+        /// <response code="404">해당되는 Id의 Employee가 존재하지 않음</response>
         [HttpGet("id/{id}")]
         [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(EmployeeDto))]
@@ -75,6 +105,18 @@ namespace ContactWebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Employee GroupId로 조회
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// POST 명령으로 복수의 데이터 Import 시 GroupId를 생성
+        /// 
+        /// 해당 GroupId와 매칭되는 Employee 배열을 반환
+        /// </remarks>
+        /// <response code="200">Employee 정보 리턴 (배열)</response>
+        /// <response code="400">유효하지 않은 GroupId 값</response>
         [HttpGet("group/{id}")]
         [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeDto>))]
@@ -87,12 +129,37 @@ namespace ContactWebApi.Controllers
                 yield return employee;
         }
 
+        /// <summary>
+        /// Employee 데이터 Import
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// CSV, JSON 형식의 Employee 데이터 Import
+        /// 
+        /// 지원되는 Request Content-Type
+        /// - application/json
+        /// - text/csv
+        /// - multipart/form-data
+        /// - application/x-www-form-urlencoded
+        /// 
+        /// 예
+        /// - Form File로 전달 시: Requst Content-Type = 'multipart/form-data', File Content-Type = 'application/json' or 'text/csv'
+        /// - Form Text로 전달 시: Requst Content-Type = 'application/x-www-form-urlencoded'
+        /// - RawData(Body)로 전달 시: Requst Content-Type = 'application/json' or 'text/csv'
+        /// 
+        /// </remarks>
+        /// <response code="201">리소스 생성 성공. 생성 개수 및 Group 리소스 Uri 반환</response>
+        /// <response code="204">빈 데이터가 들어와 아무런 변경점이 없음</response>
+        /// <response code="400">Json 또는 CSV 형태가 유효하지 않거나, 파싱된 Employee 데이터가 유효하지 않음</response>
+        /// <response code="409">데이터 중 이미 등록된 Email 또는 Tel이 존재</response>
+        /// <response code="415">지원되지 않는 ContentType</response>
         [HttpPost]
         [ImportEmployeesConsumes]
         [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ImportEmployeeResponse))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
         public async Task<IActionResult> ImportEmployees()
         {
