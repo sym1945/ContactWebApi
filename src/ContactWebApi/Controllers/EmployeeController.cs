@@ -9,7 +9,7 @@ using ContactWebApi.Helpers;
 using ContactWebApi.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-
+using System.ComponentModel.DataAnnotations;
 
 namespace ContactWebApi.Controllers
 {
@@ -34,7 +34,7 @@ namespace ContactWebApi.Controllers
         /// <remarks>
         /// </remarks>
         /// <response code="200">Employee 페이지 정보 리턴</response>
-        /// <response code="400">page 필드가 존재하지 않거나 1보다 작을때 또는, pageSize 필드가 존재하지 않거나 1 ~ 100 사이의 값이 아님</response>
+        /// <response code="400">page 필드가 존재하지 않거나 1보다 작음. 또는, pageSize 필드가 존재하지 않거나 1 ~ 100 사이의 값이 아님</response>
         [HttpGet]
         [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetEmployeePageResponse))]
@@ -59,14 +59,14 @@ namespace ContactWebApi.Controllers
         /// 동명이인을 고려하여 배열로 반환
         /// </remarks>
         /// <response code="200">Employee 정보 리턴 (배열)</response>
-        /// <response code="400">유효하지 않은 name 값</response>
+        /// <response code="400">name 필드가 존재하지 않거나 256자를 초과함</response>
         /// <response code="404">name과 일치하는 Employee가 존재하지 않음</response>
         [HttpGet("{name}")]
         [Produces(ContentTypes.ApplicationJson)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeLinkDto>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetEmployeesByName(string name)
+        public async Task<IActionResult> GetEmployeesByName([MaxLength(256)] string name)
         {
             var result = new List<EmployeeLinkDto>();
             var stream = _Mediator.CreateStream(new GetEmployeeByNameRequest { EmployeeName = name });

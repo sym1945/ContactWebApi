@@ -1,4 +1,5 @@
 ﻿using ContactWebApi.Domain.Models;
+using System;
 using System.Text;
 
 namespace ContactWebApi.App.Common.Validator
@@ -58,6 +59,11 @@ namespace ContactWebApi.App.Common.Validator
                 sb.Append($" : {{ '{value}' }}");
 
             AddError(name, sb.ToString());
+        }
+
+        protected void AddErrorOverMaxLen(string name, int maxLength)
+        {
+            AddError(name, $"The field {name} must be a string or array type with a maximum length of '{maxLength}'");
         }
 
     }

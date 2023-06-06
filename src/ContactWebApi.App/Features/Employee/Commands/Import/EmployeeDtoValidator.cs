@@ -25,11 +25,20 @@ namespace ContactWebApi.App.Features.Employee.Commands
             {
                 AddErrorCannotBeBlank(field);
             }
+            else if (model.Name.Length > 256)
+            {
+                AddErrorOverMaxLen(field, 256);
+            }
+
             // Email
             field = nameof(model.Email);
             if (StringExtensions.IsNullOrEmptyOrWhiteSpace(model.Email))
             {
                 AddErrorCannotBeBlank(field);
+            }
+            else if (model.Name.Length > 320)
+            {
+                AddErrorOverMaxLen(field, 320);
             }
             else if (!_EmailRegex.IsMatch(model.Email))
             {
@@ -40,6 +49,10 @@ namespace ContactWebApi.App.Features.Employee.Commands
             if (StringExtensions.IsNullOrEmptyOrWhiteSpace(model.Tel))
             {
                 AddErrorCannotBeBlank(field);
+            }
+            else if (model.Name.Length > 15)
+            {
+                AddErrorOverMaxLen(field, 15);
             }
             else if (!_TelRegex.IsMatch(model.Tel))
             {
