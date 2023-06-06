@@ -1,5 +1,6 @@
 ﻿using ContactWebApi.App.Common.Validator;
 using ContactWebApi.Domain.Models;
+using static ContactWebApi.App.Constants.Employee.EmployeePaging;
 
 namespace ContactWebApi.App.Features.Employee.Queries
 {
@@ -19,9 +20,9 @@ namespace ContactWebApi.App.Features.Employee.Queries
             {
                 AddErrorRequired(field);
             }
-            else if (model.Page < 1)
+            else if (model.Page < PageMin)
             {
-                AddErrorLessThan(field, 1);
+                AddErrorLessThan(field, PageMin);
             }
             // pageSize
             field = nameof(model.PageSize);
@@ -29,9 +30,9 @@ namespace ContactWebApi.App.Features.Employee.Queries
             {
                 AddErrorRequired(field);
             }
-            else if (model.PageSize < 1 && model.PageSize > 100)
+            else if (model.PageSize < PageMin && model.PageSize > PageMax)
             {
-                AddErrorRange(field, 1, 100);
+                AddErrorRange(field, PageMin, PageMax);
             }
 
             errors = _Errors.ToArray();

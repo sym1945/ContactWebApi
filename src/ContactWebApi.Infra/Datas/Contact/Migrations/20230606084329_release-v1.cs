@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ContactWebApi.Infra.Datas.Contact.Migrations
 {
-    public partial class initial : Migration
+    public partial class releasev1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

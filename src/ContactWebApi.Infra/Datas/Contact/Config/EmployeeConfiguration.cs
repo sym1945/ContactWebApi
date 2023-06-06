@@ -1,6 +1,7 @@
 ﻿using ContactWebApi.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using static ContactWebApi.App.Constants.Employee.EmployeeFiled;
 
 namespace ContactWebApi.Infra.Datas.Contact.Config
 {
@@ -12,21 +13,21 @@ namespace ContactWebApi.Infra.Datas.Contact.Config
 
             builder.Property(entity => entity.Name)
                 .HasColumnType("nvarchar")
-                .HasMaxLength(256)
+                .HasMaxLength(NameMax)
                 .IsRequired();
             builder.HasIndex(entity => entity.Name)
                 .IncludeProperties(entity => new { entity.Id, entity.Email, entity.Tel, entity.Joined });
 
             builder.Property(entity => entity.Email)
                 .HasColumnType("varchar")
-                .HasMaxLength(320)
+                .HasMaxLength(EmailMax)
                 .IsRequired();
             builder.HasIndex(entity => entity.Email)
                 .IsUnique();
 
             builder.Property(entity => entity.Tel)
                 .HasColumnType("varchar")
-                .HasMaxLength(15)
+                .HasMaxLength(TelMax)
                 .IsRequired();
             builder.HasIndex(entity => entity.Tel)
                 .IsUnique();

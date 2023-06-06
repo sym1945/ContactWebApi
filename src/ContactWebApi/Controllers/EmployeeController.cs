@@ -10,6 +10,7 @@ using ContactWebApi.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using static ContactWebApi.App.Constants.Employee.EmployeeFiled;
 
 namespace ContactWebApi.Controllers
 {
@@ -66,7 +67,7 @@ namespace ContactWebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IList<EmployeeLinkDto>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetEmployeesByName([MaxLength(256)] string name)
+        public async Task<IActionResult> GetEmployeesByName([MaxLength(NameMax)] string name)
         {
             var result = new List<EmployeeLinkDto>();
             var stream = _Mediator.CreateStream(new GetEmployeeByNameRequest { EmployeeName = name });

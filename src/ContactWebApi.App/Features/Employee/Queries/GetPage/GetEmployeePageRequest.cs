@@ -2,6 +2,7 @@
 using ContactWebApi.App.Common.Validator;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
+using static ContactWebApi.App.Constants.Employee.EmployeePaging;
 
 namespace ContactWebApi.App.Features.Employee.Queries
 {
@@ -10,10 +11,10 @@ namespace ContactWebApi.App.Features.Employee.Queries
         private IPageUriCreator? _PageUriCreator;
 
         [Required]
-        [MinValueInt32(1)]
+        [MinValueInt32(PageMin)]
         public int? Page { get; set; }
         [Required]
-        [Range(1, 100)]
+        [Range(PageMin, PageMax)]
         public int? PageSize { get; set; }
 
         public IPageUriCreator? GetPageUriCreator()

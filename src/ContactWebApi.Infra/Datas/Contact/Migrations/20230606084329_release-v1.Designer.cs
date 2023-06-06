@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContactWebApi.Infra.Datas.Contact.Migrations
 {
     [DbContext(typeof(ContactDbContext))]
-    [Migration("20230603045124_initial")]
-    partial class initial
+    [Migration("20230606084329_release-v1")]
+    partial class releasev1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

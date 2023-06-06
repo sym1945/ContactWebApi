@@ -3,6 +3,7 @@ using ContactWebApi.App.Common.Validator;
 using ContactWebApi.App.Features.Employee.DTOs;
 using ContactWebApi.Domain.Models;
 using System.Text.RegularExpressions;
+using static ContactWebApi.App.Constants.Employee.EmployeeFiled;
 
 namespace ContactWebApi.App.Features.Employee.Commands
 {
@@ -25,9 +26,9 @@ namespace ContactWebApi.App.Features.Employee.Commands
             {
                 AddErrorCannotBeBlank(field);
             }
-            else if (model.Name.Length > 256)
+            else if (model.Name.Length > NameMax)
             {
-                AddErrorOverMaxLen(field, 256);
+                AddErrorOverMaxLen(field, NameMax);
             }
 
             // Email
@@ -36,9 +37,9 @@ namespace ContactWebApi.App.Features.Employee.Commands
             {
                 AddErrorCannotBeBlank(field);
             }
-            else if (model.Name.Length > 320)
+            else if (model.Email.Length > EmailMax)
             {
-                AddErrorOverMaxLen(field, 320);
+                AddErrorOverMaxLen(field, EmailMax);
             }
             else if (!_EmailRegex.IsMatch(model.Email))
             {
@@ -50,9 +51,9 @@ namespace ContactWebApi.App.Features.Employee.Commands
             {
                 AddErrorCannotBeBlank(field);
             }
-            else if (model.Name.Length > 15)
+            else if (model.Tel.Length > TelMax)
             {
-                AddErrorOverMaxLen(field, 15);
+                AddErrorOverMaxLen(field, TelMax);
             }
             else if (!_TelRegex.IsMatch(model.Tel))
             {
