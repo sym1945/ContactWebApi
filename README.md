@@ -13,7 +13,7 @@
 ```
 | property | type | note |
 |----------|------|------|
-|`UseBulkInsert`|`bool`|데이터 Insert 시 Bulk Insert 실행 유/무를 설정합니다. MS-SQL에서만 동작합니다. |
+|`UseBulkInsert`|`bool`|데이터 Insert 시 Bulk Insert 실행 유/무를 설정합니다. **MS-SQL에서만 동작합니다.** |
 |`ConnectionString`|`string`|MS-SQL 연결 문자열을 설정합니다. **해당 부분이 공백일 경우 SQLite memory DB로 동작합니다.** |
 
 <br>

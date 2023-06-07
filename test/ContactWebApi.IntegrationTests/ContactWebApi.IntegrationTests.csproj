@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\ContactWebApi\ContactWebApi.csproj" />
     <ProjectReference Include="..\..\test\ContactWebApi.UnitTests\ContactWebApi.UnitTests.csproj" />
-    <ProjectReference Include="..\ContactWebApi\ContactWebApi.csproj" />
   </ItemGroup>
 
 </Project>
