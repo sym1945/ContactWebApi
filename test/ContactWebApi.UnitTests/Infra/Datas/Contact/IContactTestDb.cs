@@ -2,7 +2,7 @@
 
 namespace ContactWebApi.UnitTests.Infra.Datas.Contact
 {
-    internal interface IContactTestDb
+    public interface IContactTestDb
     {
         void CreateDatabase();
 

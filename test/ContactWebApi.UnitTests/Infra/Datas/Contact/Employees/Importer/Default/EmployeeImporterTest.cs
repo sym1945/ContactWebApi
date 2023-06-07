@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ContactWebApi.Domain.Exceptions;
-using ContactWebApi.App.Features.Employee.Mappers;
 using ContactWebApi.Infra.Datas.Contact.Employees;
 using static ContactWebApi.UnitTests.Infra.Datas.Contact.Employees.Importer.Default.DatabaseSetupFixture;
 using static ContactWebApi.UnitTests.Common;
@@ -10,18 +9,8 @@ namespace ContactWebApi.UnitTests.Infra.Datas.Contact.Employees.Importer.Default
     [TestFixture]
     public class EmployeeImporterTest
     {
-        private readonly static IConfigurationProvider _Configuration;
-        private readonly static IMapper _Mapper;
-
-        static EmployeeImporterTest()
-        {
-            _Configuration = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<EmployeeEntityMapper>();
-            });
-
-            _Mapper = _Configuration.CreateMapper();
-        }
+        
+        private readonly static IMapper _Mapper = GetMapper();
 
         [Test, Order(1)]
         public async Task ImportEmployeeDefault_One()

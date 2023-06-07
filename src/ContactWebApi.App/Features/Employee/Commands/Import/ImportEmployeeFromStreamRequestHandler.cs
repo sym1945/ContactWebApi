@@ -16,8 +16,8 @@ namespace ContactWebApi.App.Features.Employee.Commands
 
         public async Task<EmployeeImportResult> Handle(ImportEmployeeFromStreamRequest request, CancellationToken cancellationToken)
         {
-            var validator = new EmployeeDtoValidator();
             var parser = new EmployeeParser(request.DataType);
+            var validator = new EmployeeDtoValidator();
 
             await foreach (var employee in parser.Parse(request.DataStream))
             {

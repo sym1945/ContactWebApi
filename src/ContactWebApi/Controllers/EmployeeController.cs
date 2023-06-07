@@ -19,9 +19,9 @@ namespace ContactWebApi.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly IMediator _Mediator;
-        private readonly ILogger<EmployeeController> _Logger;
+        private readonly ILogger<EmployeeController>? _Logger;
 
-        public EmployeeController(IMediator mediator, ILogger<EmployeeController> logger)
+        public EmployeeController(IMediator mediator, ILogger<EmployeeController>? logger = null)
         {
             _Mediator = mediator;
             _Logger = logger;

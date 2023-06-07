@@ -1,5 +1,8 @@
-﻿using ContactWebApi.App.Features.Employee.DTOs;
+﻿using AutoMapper;
+using ContactWebApi.App.Features.Employee.DTOs;
+using ContactWebApi.App.Features.Employee.Mappers;
 using ContactWebApi.App.Features.Employee.Queries;
+using System.Reflection;
 using System.Text;
 
 namespace ContactWebApi.UnitTests
@@ -7,6 +10,21 @@ namespace ContactWebApi.UnitTests
 {
     public static class Common
     {
+        private readonly static IConfigurationProvider _Configuration;
+        private readonly static IMapper _Mapper;
+
+        static Common()
+        {
+            _Configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<EmployeeEntityMapper>();
+                cfg.AddProfile<EmployeeDtoMapper>();
+                cfg.AddProfile<EmployeeLinkDtoMapper>();
+            });
+
+            _Mapper = _Configuration.CreateMapper();
+        }
+
         public static EmployeeDto CreateEmployee(string name = "name", string email = "name@gmail.com", string tel = "010-1234-5678", string joined = "2023-06-06")
         {
             var dto = new EmployeeDto()
@@ -32,6 +50,11 @@ namespace ContactWebApi.UnitTests
                 sb.Append("x");
 
             return sb.ToString();
+        }
+
+        public static IMapper GetMapper()
+        {
+            return _Mapper;
         }
     }
 }

@@ -22,7 +22,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactWebApi.UnitTests", "..\test\ContactWebApi.UnitTests\ContactWebApi.UnitTests.csproj", "{CBEB8743-E126-40FB-86FC-79133ACE7349}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactWebApi.UnitTests", "..\test\ContactWebApi.UnitTests\ContactWebApi.UnitTests.csproj", "{CBEB8743-E126-40FB-86FC-79133ACE7349}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactWebApi.IntegrationTests", "ContactWebApi.IntegrationTests\ContactWebApi.IntegrationTests.csproj", "{9944FBEA-3B08-4FEE-980D-C2AB992429DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{CBEB8743-E126-40FB-86FC-79133ACE7349}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBEB8743-E126-40FB-86FC-79133ACE7349}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBEB8743-E126-40FB-86FC-79133ACE7349}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9944FBEA-3B08-4FEE-980D-C2AB992429DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9944FBEA-3B08-4FEE-980D-C2AB992429DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9944FBEA-3B08-4FEE-980D-C2AB992429DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9944FBEA-3B08-4FEE-980D-C2AB992429DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{8B3123B0-BF69-4E5E-853F-FF044F1EC7AE} = {12B8CBF8-2756-43E6-8B36-6E1B4A522E8D}
 		{F8C5B115-CAE3-4792-B09B-62D7C7C32373} = {12B8CBF8-2756-43E6-8B36-6E1B4A522E8D}
 		{CBEB8743-E126-40FB-86FC-79133ACE7349} = {97AE9263-66BB-40A8-A2A1-023987C3B647}
+		{9944FBEA-3B08-4FEE-980D-C2AB992429DD} = {97AE9263-66BB-40A8-A2A1-023987C3B647}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {97820304-F206-4555-AA4E-8F5B4BEE5252}
